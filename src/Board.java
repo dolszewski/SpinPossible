@@ -4,20 +4,22 @@ public class Board {
     private int rows;
     private int cols;
     public Board() {
-    	board = new Tile[3][3];
     	rows = 3;
     	cols = 3;
+    	this.board = new Tile[3][3];
+    	instantiateBoard();
     }
 
 	public Board(int n, int m) {
-    	board = new Tile[n][m];
     	this.rows = n;
     	this.cols = m;
+    	this.board = new Tile[n][m];
+    	instantiateBoard();
     }
     public void instantiateBoard() {
     	for (int i = 0; i < rows; i++) {
     		for (int j = 0; j < cols; j++){
-    			board[i][j] = new Tile();
+    			this.board[i][j] = new Tile();
     		}
     	}
     }
@@ -29,6 +31,16 @@ public class Board {
 	}
 	public int getCols() {
 		return cols;
+	}
+	public String toString() {
+		String str ="";
+		for (int i = 0; i < rows; i++) {
+    		for (int j = 0; j < cols; j++){
+    			str = str + board[i][j].toString();
+    		}
+    		str = str +"\n";
+    	}
+		return str;
 	}
 	
     
