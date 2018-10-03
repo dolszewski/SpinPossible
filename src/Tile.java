@@ -7,6 +7,9 @@ public class Tile {
 	private JLabel image = new JLabel();
 	private int xPosition = 0;
 	private int yPosition = 0;
+	private boolean isHighlighted = false;
+	//xwidth
+	//yheight
 	public Tile() {
 		
 		this.value = currentNumber;
@@ -14,15 +17,15 @@ public class Tile {
 		currentNumber++;
 	}
 	public String getSpin() {
+		if (value < 0) {
+			spin = "DOWN";
+		} else {
+			spin = "UP";
+		}
 		return spin;
 	}
 	public void changeSpin() {
-		if (spin.equals("UP")) {
-			spin = "DOWN";
-		}
-		else {
-			spin = "UP";
-		}
+		value = value * -1;
 	}
 	public int getValue() {
 		return value;
@@ -33,6 +36,9 @@ public class Tile {
 	}
 	public void setYPosition(int y) {
 		yPosition = y;
+	}
+	public void setHighlighted(boolean highlight) {
+		isHighlighted=highlight;
 	}
 	public String toString() {
 		String str = String.format("%d%S ", value, spin);
