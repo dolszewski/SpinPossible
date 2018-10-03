@@ -8,6 +8,7 @@ public class Tile {
 	private int xPosition = 0;
 	private int yPosition = 0;
 	private boolean isHighlighted = false;
+	private String imageName;
 	//xwidth
 	//yheight
 	public Tile() {
@@ -43,6 +44,9 @@ public class Tile {
 	public String toString() {
 		String str = String.format("%d%S ", value, spin);
 		return str;
+	}
+	public void setImageName() {
+		imageName = value+getSpin();
 	}
 	
 }
