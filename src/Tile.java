@@ -1,6 +1,10 @@
 import javax.swing.JLabel;
+import javax.swing.JFrame; // for JFrame
+import javax.swing.JLabel; // for JLabel
+import java.util.Random;
+import javax.swing.ImageIcon; // for ImageIcon
 
-public class Tile {
+public class Tile implements TileInterface{
 	private static int currentNumber = 1;
 	private String spin;
 	private int value = 0;
@@ -12,7 +16,6 @@ public class Tile {
 	//xwidth
 	//yheight
 	public Tile() {
-		
 		this.value = currentNumber;
 		this.spin = "UP";
 		currentNumber++;
@@ -31,7 +34,6 @@ public class Tile {
 	public int getValue() {
 		return value;
 	}
-
 	public void setXPosition(int x) {
 		xPosition = x;
 	}
