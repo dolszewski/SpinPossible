@@ -15,6 +15,10 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		Board b = new Board();
 		System.out.print(b.toString());
 	}
+	
+	public void spin() {
+		
+	}
 
 	@Override
 	public void run() {
