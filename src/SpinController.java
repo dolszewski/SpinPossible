@@ -9,6 +9,7 @@ class SpinController extends TimerTask implements MouseListener{
     private JFrame gameJFrame;
     private Container gameContentPane;
     private boolean gameIsReady = false;
+    
 
 	public static void main(String[] args) {
 		Board b = new Board();
