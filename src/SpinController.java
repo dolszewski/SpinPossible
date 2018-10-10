@@ -5,7 +5,7 @@ import java.util.TimerTask;
 
 import javax.swing.JFrame;
 
-class SpinController extends TimerTask implements MouseListener{
+class SpinController extends TimerTask implements MouseListener, SpinControllerInterface{
     private JFrame gameJFrame;
     private Container gameContentPane;
     private boolean gameIsReady = false;

@@ -1,5 +1,5 @@
 
-public class Board {
+public class Board implements BoardInterface{
     private Tile[][] board;
     private int rows;
     private int cols;
