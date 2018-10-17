@@ -64,7 +64,12 @@ public class Tile implements TileInterface{
 		return str;
 	}
 	public void setImageName() {
-		imageName = value+getSpin()+".jpg";
+		if (value <0 ){
+		imageName = -1*value+getSpin()+".jpg";
+		} else {
+			imageName =value+getSpin()+".jpg";
+
+		}
 		
 	}
 	public void setImage() {
@@ -79,6 +84,9 @@ public class Tile implements TileInterface{
 		height = image.getHeight();
 		//System.out.print(height);
 		
+	}
+	public String getImageName() {
+		return imageName;
 	}
 	public void draw(Graphics g) {
 		setImageName();

@@ -72,6 +72,7 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
         gameJFrame.setJMenuBar(menuBar);
 		gameJFrame.setVisible(true);
 		gameTimer.schedule(this, 0, 40); 
+	
 		
 		
 		
@@ -95,7 +96,7 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		// TODO Auto-generated method stub
 		gameJFrame.repaint();
 		gameContentPane.repaint();
-		//b.getBoard()[1][1].setHighlighted(true);
+		
 	}
 
 	@Override
@@ -132,4 +133,5 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		// TODO Auto-generated method stub
 		System.out.println(e.getActionCommand());
 	}
+    
 }
