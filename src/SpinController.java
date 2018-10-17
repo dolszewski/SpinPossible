@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.Stack;
 import java.util.TimerTask;
 
 import javax.swing.JButton;
@@ -15,10 +16,19 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 
+
+
+
+
 class SpinController extends TimerTask implements MouseListener, SpinControllerInterface, ActionListener{
+
     private JFrame gameJFrame;
     private JPanel gameContentPane;
     private boolean gameIsReady = false;
+    private Stack spinStack = new Stack();
+    private Board theBoard = new Board();
+    private int[][] selectedArray = new int[2][2];
+    private int numberSelected = 0;
     private int gameWidth = 800;
     private int gameHeight = 400;
     private java.util.Timer gameTimer = new java.util.Timer();
@@ -87,7 +97,7 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		@Override
 		public void paintComponent(Graphics g) {
 			super.paintComponent(g);
-			b.drawBoard(g);
+			theBoard.drawBoard(g);
 			
 		}
 	}
@@ -128,10 +138,92 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		// TODO Auto-generated method stub
 		
 	}
+
+
+	@Override
+	public void spin() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	
+	@Override
+	public void highlightTiles() {
+		// TODO Auto-generated method stub
+		if(numberSelected == 2) {
+			int minA = min(selectedArray[0][0], selectedArray[1][0]);
+			int maxA = max(selectedArray[0][0], selectedArray[1][0]);
+			int minB = min(selectedArray[0][1], selectedArray[1][1]);
+			int maxB = max(selectedArray[0][1], selectedArray[1][1]);
+			
+			for(int i = minA; i < maxA+1; i++) {
+				for(int j = minB; j < maxB+1; j++) {
+					theBoard.getBoard()[i][j].setHighlighted(true);
+				}
+			}
+		}
+		else if(numberSelected == 1) {
+			theBoard.getBoard()[selectedArray[0][0]][selectedArray[1][0]].setHighlighted(true);
+		}
+
+	}
+	
+	public int min(int a, int b) {
+		if(a < b)
+			return a;
+		else
+			return b;
+	}
+	
+	public int max(int a, int b) {
+		if(a > b)
+			return a;
+		else
+			return b;
+	}
+
+
+	@Override
+	public void selected(int row, int column) {
+		// TODO Auto-generated method stub
+		if(numberSelected == 0) { 
+			selectedArray[0][0] = row;
+			selectedArray[0][1] = column;
+			numberSelected++;
+		}
+		else if(numberSelected == 1) {
+			if(selectedArray[0][0] == row && selectedArray[0][1] == column)
+				numberSelected--;
+			else {
+			selectedArray[1][0] = row;
+			selectedArray[1][1] = column;
+			numberSelected++;
+			}
+		}
+		else if(numberSelected == 2) {
+			if(selectedArray[1][0] == row && selectedArray[1][1] == column)
+				numberSelected--;
+			else if(selectedArray[0][0] == row && selectedArray[0][1] == column) {
+				numberSelected--;
+				selectedArray[0][0] = selectedArray[1][0];
+				selectedArray[0][1] = selectedArray[1][1];
+			}
+			else {
+				selectedArray[1][0] = row;
+				selectedArray[1][1] = column;
+			}
+		}
+	}
+
+	
+
+
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
-		System.out.println(e.getActionCommand());
+		if(e.getActionCommand().equals(spinButton)) {
+			spin();
+		}
 	}
     
 }

@@ -60,7 +60,10 @@ public class Tile implements TileInterface{
 		isHighlighted=highlight;
 	}
 	public String toString() {
-		String str = String.format("%d%S ", value, spin);
+		String h = "";
+		if(isHighlighted)
+			h = ".";
+		String str = String.format("%d%S%S ", value, spin, h);
 		return str;
 	}
 	public void setImageName() {
