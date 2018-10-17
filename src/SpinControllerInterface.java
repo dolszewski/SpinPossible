@@ -6,7 +6,7 @@ import java.util.TimerTask;
 
 public interface SpinControllerInterface {
 	
-	public void spin(int first, int second);
+	public void spin();
 	
 	public void selected(int row, int column);
 	
