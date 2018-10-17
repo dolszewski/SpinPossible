@@ -32,7 +32,6 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
     private int gameWidth = 800;
     private int gameHeight = 400;
     private java.util.Timer gameTimer = new java.util.Timer();
-    private Board b;
     private JButton spinButton;
     private JButton undoButton;
     private int buttonSizeX = 100;
@@ -48,7 +47,6 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		SpinController spin = new SpinController();
 	}
 	public SpinController() {
-		b = new Board();
 		gameJFrame = new JFrame();
 		gameJFrame.setSize(gameWidth, gameHeight);
 		gameJFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
