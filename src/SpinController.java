@@ -176,7 +176,7 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 			}
 		}
 		else if(numberSelected == 1) {
-			theBoard.getBoard()[selectedArray[0][0]][selectedArray[1][0]].setHighlighted(true);
+			theBoard.getBoard()[selectedArray[0][0]][selectedArray[0][1]].setHighlighted(true);
 		}
 
 	}
@@ -233,11 +233,14 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
-		if(e.getActionCommand().equals(spinButton)) {
+		if(e.getSource().equals(spinButton)) {
 			spin();
 		}
 		if( e.getSource().equals(exitItem)) {
 			System.exit(0);
+		}
+		if(e.getSource().equals(newGameItem)){
+			
 		}
 	}
     
