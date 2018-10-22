@@ -29,6 +29,15 @@ public class Board implements BoardInterface{
     		}
     	}
     }
+    public void updatePositions() {
+    	for (int i = 0; i < rows; i++) {
+    		for (int j = 0; j < cols; j++){
+    			this.board[i][j].setXPosition(i*rowLength/rows);
+    			this.board[i][j].setYPosition(j*colLength/cols);
+
+    		}
+    	}
+    }
     public Tile[][] getBoard() {
 		return board;
 	}

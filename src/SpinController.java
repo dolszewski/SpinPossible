@@ -149,6 +149,8 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 	public void spin() {
 		// TODO Auto-generated method stub
 		
+		
+		theBoard.updatePositions();
 	}
 	public void unHighlightTiles() {
 		theBoard.getBoard()[selectedArray[0][0]][selectedArray[0][1]].setFirstHighlight(false);
