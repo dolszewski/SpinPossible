@@ -24,6 +24,7 @@ public class Tile implements TileInterface{
 	private int height=40;
 	private boolean isHighlighted = false;
 	private String imageName;
+	private boolean firstHighlight = false;
 	
 
 	//xwidth
@@ -75,6 +76,9 @@ public class Tile implements TileInterface{
 		}
 		
 	}
+	public void setFirstHighlight(boolean t) {
+		firstHighlight = t;
+	}
 	public void setImage() {
 		image = null;
 		try {
@@ -97,7 +101,11 @@ public class Tile implements TileInterface{
 		g.drawImage(image, xPosition, yPosition, width, height, null);
 		if (isHighlighted) {
 			g.setColor(new Color(255, 120, 120, 150));
+			if (firstHighlight){
+				g.setColor(new Color(255, 80, 140, 150));
+			}
 			g.fillRect(xPosition, yPosition, width, height);
+
 		}
 	}
 	

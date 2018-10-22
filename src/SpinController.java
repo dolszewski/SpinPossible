@@ -65,6 +65,8 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		undoButton.addActionListener(this);
 		gameContentPane.add(spinButton);
 		gameContentPane.add(undoButton);
+		gameContentPane.addMouseListener(this);
+		
 		newGameItem = new JMenuItem();
         newGameItem.setText("New Game");
         newGameItem.addActionListener(this);
@@ -110,13 +112,18 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void mousePressed(MouseEvent e) {
 		// TODO Auto-generated method stub
-		
+		int x = e.getX();
+		int y = e.getY();
+		unHighlightTiles();
+		selected(theBoard.rowSelect(x), theBoard.colSelect(y));
+
+		highlightTiles();
 	}
 
 	@Override
@@ -143,11 +150,19 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		// TODO Auto-generated method stub
 		
 	}
-
+	public void unHighlightTiles() {
+		theBoard.getBoard()[selectedArray[0][0]][selectedArray[0][1]].setFirstHighlight(false);
+		for(int i =0; i< theBoard.getRows(); i++){
+			for (int j = 0; j< theBoard.getCols(); j++) {
+				theBoard.getBoard()[i][j].setHighlighted(false);
+			}
+		}
+	}
 	
 	@Override
 	public void highlightTiles() {
 		// TODO Auto-generated method stub
+		theBoard.getBoard()[selectedArray[0][0]][selectedArray[0][1]].setFirstHighlight(true);
 		if(numberSelected == 2) {
 			int minA = min(selectedArray[0][0], selectedArray[1][0]);
 			int maxA = max(selectedArray[0][0], selectedArray[1][0]);
@@ -179,7 +194,6 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		else
 			return b;
 	}
-
 
 	@Override
 	public void selected(int row, int column) {
@@ -221,6 +235,9 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		// TODO Auto-generated method stub
 		if(e.getActionCommand().equals(spinButton)) {
 			spin();
+		}
+		if( e.getSource().equals(exitItem)) {
+			System.exit(0);
 		}
 	}
     
