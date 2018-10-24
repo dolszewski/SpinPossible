@@ -64,6 +64,7 @@ public class Board implements BoardInterface{
     		}
     	}
 	}
+
 	public int rowSelect(int x) {
 		if (x < rowLength/rows) {
 			return 0;
@@ -88,5 +89,15 @@ public class Board implements BoardInterface{
 		}
 		return 0;
 	}
+
+	public void switchTiles(int[] first, int[] second) {
+		Tile temp = new Tile();
+		temp = this.board[first[0]][first[1]];
+		this.board[first[0]][first[1]] = this.board[second[0]][second[1]];
+		this.board[second[0]][second[1]] = temp;
+	}
+	
+	
+
     
 }

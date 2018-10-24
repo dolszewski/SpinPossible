@@ -60,6 +60,9 @@ public class Tile implements TileInterface{
 	public void setHighlighted(boolean highlight) {
 		isHighlighted=highlight;
 	}
+	public boolean isHighlighted() {
+		return isHighlighted;
+	}
 	public String toString() {
 		String h = "";
 		if(isHighlighted)
