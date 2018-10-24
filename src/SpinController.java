@@ -14,7 +14,9 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+
 
 
 
@@ -41,6 +43,7 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
     private JMenu menu;
     private JMenuItem newGameItem;
     private JMenuItem exitItem;
+    private Object options[] = {"1", "2", "3"};
     
 
 	public static void main(String[] args) {
@@ -104,8 +107,13 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
-		gameJFrame.repaint();
-		gameContentPane.repaint();
+		if (gameIsReady) {
+		    gameJFrame.repaint();
+		    gameContentPane.repaint();
+		} else {
+			JOptionPane.showMessageDialog(gameJFrame, "Select your game size");
+			gameIsReady = true;
+		}
 		
 	}
 
