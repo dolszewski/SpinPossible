@@ -169,19 +169,17 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 				}
 			}
 			tempArray = switchTiles(tempArray);
-			
-			int minA = min(selectedArray[0][0], selectedArray[1][0]);
-			int maxA = max(selectedArray[0][0], selectedArray[1][0]);
-			int minB = min(selectedArray[0][1], selectedArray[1][1]);
-			int maxB = max(selectedArray[0][1], selectedArray[1][1]);
 			counter = 0;
-			for(int i = minA; i < maxA+1; i++) {
-				for(int j = minB; j < maxB+1; j++) {
-					theBoard.getBoard()[i][j] = tempArray[counter];
-					numberHighlightedTiles--;
-					counter++;
+			for(int i = 0; i < theBoard.getRows(); i++) {
+				for(int j = 0; j < theBoard.getCols(); j++) {
+					if(theBoard.getBoard()[i][j].isHighlighted()) {
+						theBoard.getBoard()[i][j] = tempArray[counter];
+						counter++;
+						//numberHighlightedTiles--;
+					}
 				}
 			}
+			
 		}
 		
 		
@@ -200,8 +198,8 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 	public Tile[] switchTiles(Tile[] a) {
 		for(int i = 0; i < a.length/2; i++) {
 			Tile temp = a[i];
-			a[i] = a[a.length-i];
-			a[a.length-i] = temp;
+			a[i] = a[a.length-1-i];
+			a[a.length-1-i] = temp;
 		}
 		return a;
 	}
