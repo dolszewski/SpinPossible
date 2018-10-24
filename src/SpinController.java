@@ -26,6 +26,7 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
     private JPanel gameContentPane;
     private boolean gameIsReady = false;
     private Stack spinStack = new Stack();
+    private Stack numberSelectedStack = new Stack();
     private Board theBoard = new Board();
     private int[][] selectedArray = new int[2][2];
     private int numberSelected = 0;
