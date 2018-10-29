@@ -25,8 +25,9 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
     private JFrame gameJFrame;
     private JPanel gameContentPane;
     private boolean gameIsReady = false;
-    private Stack spinStack = new Stack();
-    private Stack numberSelectedStack = new Stack();
+    private Stack<int[][]> spinStack = new Stack<int[][]>();
+    private Stack<Integer> numberSelectedStack = new Stack<Integer>();
+    private Stack<Board> undoBoard = new Stack<Board>();
     private Board theBoard = new Board();
     private int[][] selectedArray = new int[2][2];
     private int numberSelected = 0;
@@ -148,7 +149,7 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 
 
 	@Override
-	public void spin() {
+	public void spin(boolean isUndo) {
 		// TODO Auto-generated method stub
 		if(numberSelected == 0) {
 			System.out.println("Nothing to spin");
@@ -158,6 +159,7 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		}
 		else if(numberSelected == 2) {
 			Board tempBoard = theBoard;
+			
 			Tile[] tempArray = new Tile[numberHighlightedTiles];
 			int counter = 0;
 			for(int i = 0; i < tempBoard.getRows(); i++) {
@@ -176,19 +178,23 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 					if(theBoard.getBoard()[i][j].isHighlighted()) {
 						theBoard.getBoard()[i][j] = tempArray[counter];
 						counter++;
-						//numberHighlightedTiles--;
 					}
 				}
 			}
 			
 		}
-		spinStack.push(selectedArray);
-		numberSelectedStack.push(numberSelected);
+		if(!isUndo) {
+			int[][] tempSelectedArray = selectedArray;
+			spinStack.push(tempSelectedArray);
+			numberSelectedStack.push(numberSelected);
+			undoBoard.push(theBoard);
+		}
 		
 		
 		theBoard.updatePositions();
 	}
 	public void unHighlightTiles() {
+		numberHighlightedTiles = 0;
 		theBoard.getBoard()[selectedArray[0][0]][selectedArray[0][1]].setFirstHighlight(false);
 		for(int i =0; i< theBoard.getRows(); i++){
 			for (int j = 0; j< theBoard.getCols(); j++) {
@@ -211,9 +217,9 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 	
 	@Override
 	public void highlightTiles() {
-		// TODO Auto-generated method stub
 		theBoard.getBoard()[selectedArray[0][0]][selectedArray[0][1]].setFirstHighlight(true);
 		if(numberSelected == 2) {
+			
 			int minA = min(selectedArray[0][0], selectedArray[1][0]);
 			int maxA = max(selectedArray[0][0], selectedArray[1][0]);
 			int minB = min(selectedArray[0][1], selectedArray[1][1]);
@@ -276,6 +282,7 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 				selectedArray[1][1] = column;
 			}
 		}
+		theBoard.updatePositions();
 	}
 
 	
@@ -285,13 +292,26 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
 		if(e.getSource().equals(spinButton)) {
-			spin();
+			spin(false);
 		}
 		if( e.getSource().equals(exitItem)) {
 			System.exit(0);
 		}
 		if(e.getSource().equals(newGameItem)){
 			
+		}
+		if(e.getSource().equals(undoButton)) {
+			if(!spinStack.isEmpty()) {
+				unHighlightTiles();
+				//theBoard = undoBoard.pop();
+				selectedArray = spinStack.pop();
+				numberSelected = numberSelectedStack.pop();
+				highlightTiles();
+				theBoard.updatePositions();
+				spin(true);
+			}
+			else
+				System.out.println("Nothing to undo!");
 		}
 	}
     
