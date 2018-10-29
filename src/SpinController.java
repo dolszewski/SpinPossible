@@ -182,6 +182,8 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 			}
 			
 		}
+		spinStack.push(selectedArray);
+		numberSelectedStack.push(numberSelected);
 		
 		
 		theBoard.updatePositions();
