@@ -123,10 +123,12 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		// TODO Auto-generated method stub
 		int x = e.getX();
 		int y = e.getY();
+		if (x < 360 && y < 360) {
 		unHighlightTiles();
 		selected(theBoard.rowSelect(x), theBoard.colSelect(y));
 
 		highlightTiles();
+		}
 	}
 
 	@Override
@@ -282,7 +284,7 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 				selectedArray[1][1] = column;
 			}
 		}
-		theBoard.updatePositions();
+		//theBoard.updatePositions();
 	}
 
 	
@@ -291,6 +293,7 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
+		//System.out.println(e.getSource());
 		if(e.getSource().equals(spinButton)) {
 			spin(false);
 		}
@@ -313,6 +316,7 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 			else
 				System.out.println("Nothing to undo!");
 		}
+		
 	}
     
 }
