@@ -183,13 +183,14 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 			}
 			
 		}
+		/*
 		if(!isUndo) {
 			int[][] tempSelectedArray = selectedArray;
 			spinStack.push(tempSelectedArray);
 			numberSelectedStack.push(numberSelected);
 			undoBoard.push(theBoard);
 		}
-		
+		*/
 		
 		theBoard.updatePositions();
 	}
@@ -292,6 +293,8 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
 		if(e.getSource().equals(spinButton)) {
+			spinStack.push(selectedArray);
+			numberSelectedStack.push(numberSelected);
 			spin(false);
 		}
 		if( e.getSource().equals(exitItem)) {
@@ -303,16 +306,15 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		if(e.getSource().equals(undoButton)) {
 			if(!spinStack.isEmpty()) {
 				unHighlightTiles();
-				//theBoard = undoBoard.pop();
 				selectedArray = spinStack.pop();
 				numberSelected = numberSelectedStack.pop();
 				highlightTiles();
-				theBoard.updatePositions();
 				spin(true);
 			}
 			else
 				System.out.println("Nothing to undo!");
 		}
 	}
+	
     
 }
