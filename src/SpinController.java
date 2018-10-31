@@ -25,7 +25,7 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
     private JFrame gameJFrame;
     private JPanel gameContentPane;
     private boolean gameIsReady = false;
-    private Stack<int[][]> spinStack = new Stack<int[][]>();
+    private Stack<Integer[][]> spinStack = new Stack<Integer[][]>();
     private Stack<Integer> numberSelectedStack = new Stack<Integer>();
     private Stack<Board> undoBoard = new Stack<Board>();
     private Board theBoard = new Board();
@@ -123,10 +123,12 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		// TODO Auto-generated method stub
 		int x = e.getX();
 		int y = e.getY();
+		if (x < 360 && y < 360) {
 		unHighlightTiles();
 		selected(theBoard.rowSelect(x), theBoard.colSelect(y));
 
 		highlightTiles();
+		}
 	}
 
 	@Override
@@ -283,7 +285,7 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 				selectedArray[1][1] = column;
 			}
 		}
-		theBoard.updatePositions();
+		//theBoard.updatePositions();
 	}
 
 	
@@ -291,9 +293,8 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		// TODO Auto-generated method stub
 		if(e.getSource().equals(spinButton)) {
-			spinStack.push(selectedArray);
+			spinStack.push(convert(selectedArray));
 			numberSelectedStack.push(numberSelected);
 			spin(false);
 		}
@@ -306,7 +307,7 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		if(e.getSource().equals(undoButton)) {
 			if(!spinStack.isEmpty()) {
 				unHighlightTiles();
-				selectedArray = spinStack.pop();
+				selectedArray = convertBack(spinStack.pop());
 				numberSelected = numberSelectedStack.pop();
 				highlightTiles();
 				spin(true);
@@ -314,7 +315,27 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 			else
 				System.out.println("Nothing to undo!");
 		}
+		
 	}
 	
+	public Integer[][] convert(int[][] a){
+		Integer[][] b = new Integer[2][2];
+		for(int i = 0; i < a.length; i++) {
+			for(int j = 0; j < a.length; j++) {
+				b[i][j] = (int) a[i][j];
+			}
+		}
+		return b;
+	}
+	
+	public int[][] convertBack(Integer[][] a){
+		int[][] b = new int[2][2];
+		for(int i = 0; i < a.length; i++) {
+			for(int j = 0; j < a.length; j++) {
+				b[i][j] = (int) a[i][j];
+			}
+		}
+		return b;
+	}
     
 }
