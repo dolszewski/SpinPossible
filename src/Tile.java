@@ -111,5 +111,11 @@ public class Tile implements TileInterface{
 
 		}
 	}
+	public boolean equals(Tile a) {
+		if(a.getValue() == value) 
+			return true;
+		else
+			return false;
+	}
 	
 }

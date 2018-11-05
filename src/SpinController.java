@@ -6,7 +6,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+
 import java.lang.reflect.Array;
+
+import java.util.Random;
+
 import java.util.Stack;
 import java.util.TimerTask;
 
@@ -26,7 +30,7 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
     private JFrame gameJFrame;
     private JPanel gameContentPane;
     private boolean gameIsReady = false;
-    private Stack<int[][]> spinStack = new Stack<int[][]>();
+    private Stack<Integer[][]> spinStack = new Stack<Integer[][]>();
     private Stack<Integer> numberSelectedStack = new Stack<Integer>();
     private Stack<Board> undoBoard = new Stack<Board>();
     private Board theBoard = new Board();
@@ -46,7 +50,7 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
     private JMenuItem newGameItem;
     private JMenuItem exitItem;
     private int numberHighlightedTiles = 0;
-    
+    private int numberOfSpins = 0;
 
 	public static void main(String[] args) {
 		SpinController spin = new SpinController();
@@ -87,9 +91,8 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
         gameJFrame.setJMenuBar(menuBar);
 		gameJFrame.setVisible(true);
 		gameTimer.schedule(this, 0, 40); 
-	
 		
-		
+		easyBoard();
 		
 	}
 	private class myPane extends JPanel {
@@ -153,7 +156,7 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 
 
 	@Override
-	public void spin(boolean isUndo) {
+	public void spin() {
 		// TODO Auto-generated method stub
 		if(numberSelected == 0) {
 			System.out.println("Nothing to spin");
@@ -187,13 +190,9 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 			}
 			
 		}
-		if(!isUndo) {
-			tempSelectedArray = copy(selectedArray);
-			spinStack.push(tempSelectedArray);
-			numberSelectedStack.push(numberSelected);
-			undoBoard.push(theBoard);
-		}
-		
+
+		System.out.println("I won? " + theBoard.isIdentity());
+
 		
 		theBoard.updatePositions();
 	}
@@ -298,10 +297,11 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		// TODO Auto-generated method stub
-		//System.out.println(e.getSource());
 		if(e.getSource().equals(spinButton)) {
-			spin(false);
+			spinStack.push(convert(selectedArray));
+			numberSelectedStack.push(numberSelected);
+			spin();
+			numberOfSpins++;
 		}
 		if( e.getSource().equals(exitItem)) {
 			System.exit(0);
@@ -312,11 +312,13 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		if(e.getSource().equals(undoButton)) {
 			if(!spinStack.isEmpty()) {
 				unHighlightTiles();
-				//theBoard = undoBoard.pop();
-				selectedArray = spinStack.pop();
+				selectedArray = convertBack(spinStack.pop());
 				numberSelected = numberSelectedStack.pop();
 				highlightTiles();
-				spin(true);
+
+				spin();
+				numberOfSpins--;
+
 			}
 			else
 				System.out.println("Nothing to undo!");
@@ -325,5 +327,68 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 	}
 	
 
+	public Integer[][] convert(int[][] a){
+		Integer[][] b = new Integer[2][2];
+		for(int i = 0; i < a.length; i++) {
+			for(int j = 0; j < a.length; j++) {
+				b[i][j] = (int) a[i][j];
+			}
+		}
+		return b;
+	}
+	
+	public int[][] convertBack(Integer[][] a){
+		int[][] b = new int[2][2];
+		for(int i = 0; i < a.length; i++) {
+			for(int j = 0; j < a.length; j++) {
+				b[i][j] = (int) a[i][j];
+			}
+		}
+		return b;
+	}
+	
+	public void easyBoard() {
+		int[][] tempSelectedArray = new int[2][2];
+		int max = 5;
+		int min = 3;
+		Random randomNum = new Random();
+		int numSpins = min + randomNum.nextInt(max);
+		for(int i = 0; i < numSpins; i++) {
+			unHighlightTiles();
+			tempSelectedArray[0][0] = randomNum.nextInt(3);
+			tempSelectedArray[0][1] = randomNum.nextInt(3);
+			tempSelectedArray[1][0] = randomNum.nextInt(3);
+			tempSelectedArray[1][1] = randomNum.nextInt(3);
+			selectedArray = tempSelectedArray;
+			numberSelected = 2;
+			highlightTiles();
+			spin();
+		}
+		unHighlightTiles();
+		selectedArray = new int[2][2];
+		numberSelected = 0;
+	}
+	
+	public void hardBoard() {
+		int[][] tempSelectedArray = new int[2][2];
+		int max = 10;
+		int min = 8;
+		Random randomNum = new Random();
+		int numSpins = min + randomNum.nextInt(max);
+		for(int i = 0; i < numSpins; i++) {
+			unHighlightTiles();
+			tempSelectedArray[0][0] = randomNum.nextInt(3);
+			tempSelectedArray[0][1] = randomNum.nextInt(3);
+			tempSelectedArray[1][0] = randomNum.nextInt(3);
+			tempSelectedArray[1][1] = randomNum.nextInt(3);
+			selectedArray = tempSelectedArray;
+			numberSelected = randomNum.nextInt(2)+1;
+			highlightTiles();
+			spin();
+		}
+		unHighlightTiles();
+		selectedArray = new int[2][2];
+		numberSelected = 0;
+	}
     
 }
