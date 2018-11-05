@@ -92,7 +92,7 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		gameJFrame.setVisible(true);
 		gameTimer.schedule(this, 0, 40); 
 		
-		easyBoard();
+		//easyBoard();
 		
 	}
 	private class myPane extends JPanel {
