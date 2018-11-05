@@ -45,7 +45,7 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
     private JMenuItem newGameItem;
     private JMenuItem exitItem;
     private int numberHighlightedTiles = 0;
-    
+    private int numberOfSpins = 0;
 
 	public static void main(String[] args) {
 		SpinController spin = new SpinController();
@@ -88,8 +88,6 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		gameTimer.schedule(this, 0, 40); 
 		
 		easyBoard();
-		
-		
 		
 	}
 	private class myPane extends JPanel {
@@ -292,6 +290,7 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 			spinStack.push(convert(selectedArray));
 			numberSelectedStack.push(numberSelected);
 			spin();
+			numberOfSpins++;
 		}
 		if( e.getSource().equals(exitItem)) {
 			System.exit(0);
@@ -306,6 +305,7 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 				numberSelected = numberSelectedStack.pop();
 				highlightTiles();
 				spin();
+				numberOfSpins--;
 			}
 			else
 				System.out.println("Nothing to undo!");
@@ -340,14 +340,19 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		Random randomNum = new Random();
 		int numSpins = min + randomNum.nextInt(max);
 		for(int i = 0; i < numSpins; i++) {
-			tempSelectedArray[0][0] = randomNum.nextInt(2);
-			tempSelectedArray[0][1] = randomNum.nextInt(2);
-			tempSelectedArray[1][0] = randomNum.nextInt(2);
-			tempSelectedArray[1][1] = randomNum.nextInt(2);
+			unHighlightTiles();
+			tempSelectedArray[0][0] = randomNum.nextInt(3);
+			tempSelectedArray[0][1] = randomNum.nextInt(3);
+			tempSelectedArray[1][0] = randomNum.nextInt(3);
+			tempSelectedArray[1][1] = randomNum.nextInt(3);
 			selectedArray = tempSelectedArray;
 			numberSelected = 2;
+			highlightTiles();
 			spin();
 		}
+		unHighlightTiles();
+		selectedArray = new int[2][2];
+		numberSelected = 0;
 	}
 	
 	public void hardBoard() {
@@ -357,14 +362,19 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		Random randomNum = new Random();
 		int numSpins = min + randomNum.nextInt(max);
 		for(int i = 0; i < numSpins; i++) {
-			tempSelectedArray[0][0] = randomNum.nextInt(2);
-			tempSelectedArray[0][1] = randomNum.nextInt(2);
-			tempSelectedArray[1][0] = randomNum.nextInt(2);
-			tempSelectedArray[1][1] = randomNum.nextInt(2);
+			unHighlightTiles();
+			tempSelectedArray[0][0] = randomNum.nextInt(3);
+			tempSelectedArray[0][1] = randomNum.nextInt(3);
+			tempSelectedArray[1][0] = randomNum.nextInt(3);
+			tempSelectedArray[1][1] = randomNum.nextInt(3);
 			selectedArray = tempSelectedArray;
-			numberSelected = randomNum.nextInt(1)+1;
+			numberSelected = randomNum.nextInt(2)+1;
+			highlightTiles();
 			spin();
 		}
+		unHighlightTiles();
+		selectedArray = new int[2][2];
+		numberSelected = 0;
 	}
     
 }
