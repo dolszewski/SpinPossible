@@ -23,8 +23,8 @@ public class Board implements BoardInterface{
     	for (int i = 0; i < rows; i++) {
     		for (int j = 0; j < cols; j++){
     			this.board[i][j] = new Tile();
-    			this.board[i][j].setXPosition(i*rowLength/rows);
-    			this.board[i][j].setYPosition(j*colLength/cols);
+    			this.board[i][j].setXPosition(j*rowLength/rows);
+    			this.board[i][j].setYPosition(i*colLength/cols);
 
     		}
     	}
@@ -32,8 +32,8 @@ public class Board implements BoardInterface{
     public void updatePositions() {
     	for (int i = 0; i < rows; i++) {
     		for (int j = 0; j < cols; j++){
-    			this.board[i][j].setXPosition(i*rowLength/rows);
-    			this.board[i][j].setYPosition(j*colLength/cols);
+    			this.board[i][j].setXPosition(j*rowLength/rows);
+    			this.board[i][j].setYPosition(i*colLength/cols);
 
     		}
     	}

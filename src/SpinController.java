@@ -125,7 +125,7 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		int y = e.getY();
 		if (x < 360 && y < 360) {
 		unHighlightTiles();
-		selected(theBoard.rowSelect(x), theBoard.colSelect(y));
+		selected(theBoard.colSelect(y), theBoard.rowSelect(x));
 
 		highlightTiles();
 		}
@@ -338,7 +338,7 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		int max = 5;
 		int min = 3;
 		Random randomNum = new Random();
-		int numSpins = min + randomNum.nextInt(max);
+		int numSpins = max - randomNum.nextInt(min);
 		for(int i = 0; i < numSpins; i++) {
 			unHighlightTiles();
 			tempSelectedArray[0][0] = randomNum.nextInt(3);
@@ -360,7 +360,7 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		int max = 10;
 		int min = 8;
 		Random randomNum = new Random();
-		int numSpins = min + randomNum.nextInt(max);
+		int numSpins = max + randomNum.nextInt(min);
 		for(int i = 0; i < numSpins; i++) {
 			unHighlightTiles();
 			tempSelectedArray[0][0] = randomNum.nextInt(3);
