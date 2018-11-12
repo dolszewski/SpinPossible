@@ -4,11 +4,13 @@ public class Board implements BoardInterface{
     private Tile[][] board;
     private int rows;
     private int cols;
-    private int rowLength = 360;
-    private int colLength = 360;
+    private int rowLength;
+    private int colLength;
     public Board() {
     	rows = 3;
     	cols = 3;
+    	rowLength = 360;
+    	colLength = 360;
     	this.board = new Tile[3][3];
     	instantiateBoard();
     }
@@ -16,15 +18,19 @@ public class Board implements BoardInterface{
 	public Board(int n, int m) {
     	this.rows = n;
     	this.cols = m;
+    	rowLength = 120*n;
+    	colLength = 120*m;
     	this.board = new Tile[n][m];
     	instantiateBoard();
     }
     public void instantiateBoard() {
+    	Tile.resetCurrentNumber();
     	for (int i = 0; i < rows; i++) {
     		for (int j = 0; j < cols; j++){
     			this.board[i][j] = new Tile();
-    			this.board[i][j].setXPosition(i*rowLength/rows);
-    			this.board[i][j].setYPosition(j*colLength/cols);
+    			this.board[i][j].setXPosition(j*rowLength/rows);
+    			this.board[i][j].setYPosition(i*colLength/cols);
+    			
 
     		}
     	}
@@ -32,8 +38,8 @@ public class Board implements BoardInterface{
     public void updatePositions() {
     	for (int i = 0; i < rows; i++) {
     		for (int j = 0; j < cols; j++){
-    			this.board[i][j].setXPosition(i*rowLength/rows);
-    			this.board[i][j].setYPosition(j*colLength/cols);
+    			this.board[i][j].setXPosition(j*rowLength/rows);
+    			this.board[i][j].setYPosition(i*colLength/cols);
 
     		}
     	}
@@ -64,11 +70,12 @@ public class Board implements BoardInterface{
     		}
     	}
 	}
-	public int rowSelect(int x) {
-		if (x < rowLength/rows) {
+
+	public int rowSelect(int x, int rowLength) {
+		if (x < rowLength/cols) {
 			return 0;
 		}
-		if (x < 2*rowLength/rows) {
+		if (x < 2*rowLength/cols) {
 			return 1;
 		}
 		if (x < rowLength) {
@@ -76,11 +83,11 @@ public class Board implements BoardInterface{
 		}
 		return 0;
 	}
-	public int colSelect(int y) {
-		if (y < colLength/cols) {
+	public int colSelect(int y,int colLength) {
+		if (y < colLength/rows) {
 			return 0;
 		}
-		if (y < 2*colLength/cols) {
+		if (y < 2*colLength/rows) {
 			return 1;
 		}
 		if (y < colLength) {
@@ -88,5 +95,31 @@ public class Board implements BoardInterface{
 		}
 		return 0;
 	}
+
+	public void switchTiles(int[] first, int[] second) {
+		Tile temp = new Tile();
+		temp = this.board[first[0]][first[1]];
+		this.board[first[0]][first[1]] = this.board[second[0]][second[1]];
+		this.board[second[0]][second[1]] = temp;
+	}
+	
+	public boolean isIdentity() {
+		int value = 0;
+		for (int i = 0; i < rows; i++) {
+	    		for (int j = 0; j < cols; j++){
+	    			value++;
+	    			if(this.board[i][j].getValue() != value)
+	    				return false;
+	    		}
+		}
+		return true;
+	}
+	public int getRowLength() {
+		return rowLength;
+	}
+	public int getColLength() {
+		return colLength;
+	}
+
     
 }

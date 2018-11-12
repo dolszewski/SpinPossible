@@ -30,8 +30,12 @@ public class Tile implements TileInterface{
 	//xwidth
 	//yheight
 	public Tile() {
+		if(currentNumber >= 10) {
+			currentNumber = 1;
+		}
 		this.value = currentNumber;
 		this.spin = "UP";
+		
 		currentNumber++;
 		setImageName();
 		setImage();
@@ -59,6 +63,9 @@ public class Tile implements TileInterface{
 	}
 	public void setHighlighted(boolean highlight) {
 		isHighlighted=highlight;
+	}
+	public boolean isHighlighted() {
+		return isHighlighted;
 	}
 	public String toString() {
 		String h = "";
@@ -108,5 +115,15 @@ public class Tile implements TileInterface{
 
 		}
 	}
+	public boolean equals(Tile a) {
+		if(a.getValue() == value) 
+			return true;
+		else
+			return false;
+	}
+	public static void resetCurrentNumber() {
+		currentNumber = 1;
+	}
+	
 	
 }

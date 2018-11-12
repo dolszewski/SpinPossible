@@ -7,7 +7,6 @@ import javax.swing.ImageIcon; // for ImageIcon
 public interface TileInterface {
 	
 	public String getSpin();
-
 	public void changeSpin() ;
 	public int getValue();
 	public void setXPosition(int x);
