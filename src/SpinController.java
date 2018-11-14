@@ -6,7 +6,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+
+import java.lang.reflect.Array;
+
 import java.util.Random;
+
 import java.util.Stack;
 import java.util.TimerTask;
 
@@ -31,6 +35,7 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
     private Stack<Board> undoBoard = new Stack<Board>();
     private Board theBoard = new Board();
     private int[][] selectedArray = new int[2][2];
+    private int[][] tempSelectedArray = new int[2][2];
     private int numberSelected = 0;
     private int gameWidth = 800;
     private int gameHeight = 400;
@@ -185,9 +190,15 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 			}
 			
 		}
+
 		System.out.println("I won? " + theBoard.isIdentity());
+
 		
 		theBoard.updatePositions();
+	}
+	public static int[][] copy(int[][] a){
+		int[][] temp = {{a[0][0],a[0][1]},{a[1][0],a[1][1]}};
+		return temp;
 	}
 	public void unHighlightTiles() {
 		numberHighlightedTiles = 0;
@@ -304,8 +315,10 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 				selectedArray = convertBack(spinStack.pop());
 				numberSelected = numberSelectedStack.pop();
 				highlightTiles();
+
 				spin();
 				numberOfSpins--;
+
 			}
 			else
 				System.out.println("Nothing to undo!");
@@ -313,6 +326,7 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		
 	}
 	
+
 	public Integer[][] convert(int[][] a){
 		Integer[][] b = new Integer[2][2];
 		for(int i = 0; i < a.length; i++) {
