@@ -321,6 +321,7 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 			System.exit(0);
 		}
 		if(e.getSource().equals(newGameItem)){
+			emptySpinStack(); //Need to write this function
 			startGame();
 		}
 		if(e.getSource().equals(undoButton)) {
@@ -341,6 +342,11 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 	}
 	
 
+	public void emptySpinStack() {
+		// TODO Auto-generated method stub
+		
+		
+	}
 	public Integer[][] convert(int[][] a){
 		Integer[][] b = new Integer[2][2];
 		for(int i = 0; i < a.length; i++) {
