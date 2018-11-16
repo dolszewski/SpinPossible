@@ -555,10 +555,11 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 				holder.add(a.substring(0, a.length()-1));
 			}
 		}
-		String[] a = (String[]) holder.toArray();
+		String[] a = new String[holder.size()];
 		int i = 0;
 		while(!holder.isEmpty()) {
-			System.out.println(holder.poll() + a[i]);
+			a[i] = holder.poll();
+			System.out.println(a[i]);
 			i++;
 		}
 		input.close();
