@@ -542,7 +542,7 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		}
 	}
 	
-	public void loadNames() {
+	public String[] loadNames() {
 		String filename = "savedBoard.txt";
 		Queue<String> holder = new LinkedList<>();
 		File myFile = new File(filename);
@@ -555,16 +555,21 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 				holder.add(a.substring(0, a.length()-1));
 			}
 		}
+		String[] a = (String[]) holder.toArray();
+		int i = 0;
 		while(!holder.isEmpty()) {
-			System.out.println(holder.poll());
+			System.out.println(holder.poll() + a[i]);
+			i++;
 		}
 		input.close();
+		return a;
 		}
 		catch(Exception e)
 		{
 			System.out.println("File \"" + filename + "\" not found.");	
 			e.printStackTrace();
 		}
+		return null;
 	}
 	
 	public void deleteSavedBoard(String name) {
@@ -607,5 +612,15 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	public boolean isAName(String newName) {
+		String[] names = loadNames();
+		for(int i = 0; i < names.length; i++) {
+			if(newName.equals(names[i])) {
+				return true;
+			}
+		}
+		return false;
 	}
 }
