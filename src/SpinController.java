@@ -419,13 +419,18 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		while(!gameSetUpDone) {
 			int option = JOptionPane.showConfirmDialog(gameJFrame, options, "New Game", JOptionPane.OK_CANCEL_OPTION);
 			if (option != JOptionPane.CANCEL_OPTION){
-				if (Integer.parseInt(rows.getText()) > 3 || Integer.parseInt(columns.getText()) >3 ){
+				if(rows.getText() == null ||columns.getText() == null ){
+					JOptionPane.showMessageDialog(gameJFrame, "You did not enter valid rows or columns. Please enter an integer less than or equal to 3");
+
+				}else if (Integer.parseInt(rows.getText()) > 3 || Integer.parseInt(columns.getText()) >3 ){
 					JOptionPane.showMessageDialog(gameJFrame, "You did not enter valid rows or columns. Please enter an integer less than or equal to 3");
 				} else {
 					row = Integer.parseInt(rows.getText());
 					column = Integer.parseInt(columns.getText());
 					gameSetUpDone = true;
 				}
+				
+			} else {
 				
 			}
 		}
