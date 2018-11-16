@@ -6,20 +6,27 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
-
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Random;
-
+import java.util.Scanner;
 import java.util.Stack;
 import java.util.TimerTask;
-
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
+
 
 
 
@@ -33,7 +40,7 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
     private Stack<Integer[][]> spinStack = new Stack<Integer[][]>();
     private Stack<Integer> numberSelectedStack = new Stack<Integer>();
     private Stack<Board> undoBoard = new Stack<Board>();
-    private Board theBoard = new Board();
+    private Board theBoard;
     private int[][] selectedArray = new int[2][2];
     private int[][] tempSelectedArray = new int[2][2];
     private int numberSelected = 0;
@@ -49,8 +56,15 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
     private JMenu menu;
     private JMenuItem newGameItem;
     private JMenuItem exitItem;
+    private Object options[] = {"1", "2", "3"};
     private int numberHighlightedTiles = 0;
     private int numberOfSpins = 0;
+    private int row = 3;
+    private int column = 3;
+    private int rowLength =0;
+    private int colLength = 0;
+    private int initialSpins = 0;
+
 
 	public static void main(String[] args) {
 		SpinController spin = new SpinController();
@@ -91,8 +105,7 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
         gameJFrame.setJMenuBar(menuBar);
 		gameJFrame.setVisible(true);
 		gameTimer.schedule(this, 0, 40); 
-		
-		easyBoard();
+
 		
 	}
 	private class myPane extends JPanel {
@@ -105,15 +118,22 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		@Override
 		public void paintComponent(Graphics g) {
 			super.paintComponent(g);
-			theBoard.drawBoard(g);
-			
+			if (gameIsReady){
+				theBoard.drawBoard(g);
+			}
 		}
 	}
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
-		gameJFrame.repaint();
-		gameContentPane.repaint();
+		if (gameIsReady) {
+		    gameJFrame.repaint();
+		    gameContentPane.repaint();
+		} else {
+			startGame();
+			//JOptionPane.showMessageDialog(gameJFrame, "Select your game size");
+			
+		}
 		
 	}
 
@@ -128,11 +148,14 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		// TODO Auto-generated method stub
 		int x = e.getX();
 		int y = e.getY();
-		if (x < 360 && y < 360) {
-		unHighlightTiles();
-		selected(theBoard.colSelect(y), theBoard.rowSelect(x));
 
-		highlightTiles();
+		
+		if (y < rowLength && x < colLength) {
+			unHighlightTiles();
+			selected(theBoard.colSelect(y, rowLength),theBoard.rowSelect(x, colLength));
+
+
+			highlightTiles();
 		}
 	}
 
@@ -202,9 +225,10 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 	}
 	public void unHighlightTiles() {
 		numberHighlightedTiles = 0;
-		theBoard.getBoard()[selectedArray[0][0]][selectedArray[0][1]].setFirstHighlight(false);
+		//theBoard.getBoard()[selectedArray[0][0]][selectedArray[0][1]].setFirstHighlight(false);
 		for(int i =0; i< theBoard.getRows(); i++){
 			for (int j = 0; j< theBoard.getCols(); j++) {
+				theBoard.getBoard()[i][j].setHighlighted(false);
 				theBoard.getBoard()[i][j].setHighlighted(false);
 			}
 		}
@@ -298,16 +322,23 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource().equals(spinButton)) {
-			spinStack.push(convert(selectedArray));
-			numberSelectedStack.push(numberSelected);
-			spin();
-			numberOfSpins++;
+			if(numberSelected > 0) {
+				spinStack.push(convert(selectedArray));
+				numberSelectedStack.push(numberSelected);
+				spin();
+				numberOfSpins++;
+				System.out.println("Spin: " + numberOfSpins);
+			}
+			else
+				System.out.println("Nothing to spin!");
 		}
 		if( e.getSource().equals(exitItem)) {
+			saveBoard("Test");
 			System.exit(0);
 		}
 		if(e.getSource().equals(newGameItem)){
-			
+			emptySpinStack(); //Need to write this function
+			startGame();
 		}
 		if(e.getSource().equals(undoButton)) {
 			if(!spinStack.isEmpty()) {
@@ -318,6 +349,7 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 
 				spin();
 				numberOfSpins--;
+				System.out.println("Spin: " + numberOfSpins);
 
 			}
 			else
@@ -327,6 +359,14 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 	}
 	
 
+	public void emptySpinStack() {
+		// TODO Auto-generated method stub
+		while(!spinStack.isEmpty()) {
+			spinStack.pop();
+			numberSelectedStack.pop();
+		}
+		
+	}
 	public Integer[][] convert(int[][] a){
 		Integer[][] b = new Integer[2][2];
 		for(int i = 0; i < a.length; i++) {
@@ -353,6 +393,7 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		int min = 3;
 		Random randomNum = new Random();
 		int numSpins = max - randomNum.nextInt(min);
+		initialSpins = numSpins;
 		for(int i = 0; i < numSpins; i++) {
 			unHighlightTiles();
 			tempSelectedArray[0][0] = randomNum.nextInt(3);
@@ -367,6 +408,7 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		unHighlightTiles();
 		selectedArray = new int[2][2];
 		numberSelected = 0;
+		System.out.println("Can beat " + initialSpins + " spins?");
 	}
 	
 	public void hardBoard() {
@@ -375,6 +417,7 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		int min = 8;
 		Random randomNum = new Random();
 		int numSpins = max + randomNum.nextInt(min);
+		initialSpins = numSpins;
 		for(int i = 0; i < numSpins; i++) {
 			unHighlightTiles();
 			tempSelectedArray[0][0] = randomNum.nextInt(3);
@@ -389,6 +432,180 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		unHighlightTiles();
 		selectedArray = new int[2][2];
 		numberSelected = 0;
+		System.out.println("Can beat " + initialSpins + " spins?");
 	}
     
+	public void startGame() {
+		JTextField rows = new JTextField();
+		JTextField columns = new JTextField();
+		Object[] options = {"Rows:", rows, "Columns: ", columns};
+		boolean gameSetUpDone = false;
+		while(!gameSetUpDone) {
+			int option = JOptionPane.showConfirmDialog(gameJFrame, options, "New Game", JOptionPane.OK_CANCEL_OPTION);
+			if (option != JOptionPane.CANCEL_OPTION){
+				if (Integer.parseInt(rows.getText()) > 3 || Integer.parseInt(columns.getText()) >3 ){
+					JOptionPane.showMessageDialog(gameJFrame, "You did not enter valid rows or columns. Please enter an integer less than or equal to 3");
+				} else {
+					row = Integer.parseInt(rows.getText());
+					column = Integer.parseInt(columns.getText());
+					gameSetUpDone = true;
+				}
+				
+			}
+		}
+		
+		Object[] difficulty = {"Free", "Easy","Hard"};
+		String gamePlay = (String)JOptionPane.showInputDialog(gameJFrame, "Select Difficulty","Customized Dialog", JOptionPane.PLAIN_MESSAGE, null, difficulty, "Free");
+		theBoard = new Board(row, column);
+		if (gamePlay.equals("Easy")){
+			easyBoard();
+		} else if (gamePlay.equals("Hard")) {
+			hardBoard();
+		}
+		rowLength = theBoard.getRowLength();
+		colLength = theBoard.getColLength();
+		emptySpinStack();
+		numberSelected = 0;
+		selectedArray = new int[2][2];
+		gameIsReady = true;
+		loadNames();
+	}
+	
+	public void saveBoard(String name) {
+		PrintWriter writer;
+		try {
+			String filename = "savedBoard.txt";
+			Queue<String> holder = new LinkedList<>();
+			File myFile = new File(filename);
+			try {
+				Scanner input = new Scanner(myFile);
+				while(input.hasNextLine()) {
+					holder.add(input.nextLine()+"");
+				}
+				input.close();
+			}
+			catch(Exception e) {
+				System.out.println("File \"" + filename + "\" not found.");	
+				e.printStackTrace();
+			}
+			writer = new PrintWriter(filename, "UTF-8");
+			while(!holder.isEmpty()) {
+				writer.println(holder.poll());
+			}
+			writer.println(name+"_");
+			writer.println(theBoard.getRows()+"");
+			writer.println(theBoard.getCols()+"");
+			writer.println(numberOfSpins + "");
+			for(int i = 0; i < theBoard.getRows(); i++) {
+				for(int j = 0; j < theBoard.getCols(); j++) {
+					writer.println(theBoard.getBoard()[i][j].getValue() + "");
+				}
+			}
+			writer.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void loadBoard(String name) {
+		String filename = "savedBoard.txt";
+		File myFile = new File(filename);
+		try
+		{
+		Scanner input = new Scanner(myFile);
+		if(input.nextLine().equals(name)) {
+			int row = input.nextInt();
+			input.nextLine();
+			int col = input.nextInt();
+			input.nextLine();
+			numberOfSpins = input.nextInt();
+			theBoard = new Board(row, col);
+			for(int i = 0; i < row; i++) {
+				for(int j = 0; j < col; j++) {
+					theBoard.getBoard()[i][j].setValue(input.nextInt());
+					input.nextLine();
+				}
+			 }
+			 
+		}
+		
+		input.close();
+		}
+		catch(Exception e)
+		{
+			System.out.println("File \"" + filename + "\" not found.");	
+			e.printStackTrace();
+		}
+	}
+	
+	public void loadNames() {
+		String filename = "savedBoard.txt";
+		Queue<String> holder = new LinkedList<>();
+		File myFile = new File(filename);
+		try
+		{
+		Scanner input = new Scanner(myFile);
+		while(input.hasNextLine()) {
+			String a = input.nextLine();
+			if(a.contains("_")) {
+				holder.add(a.substring(0, a.length()-1));
+			}
+		}
+		while(!holder.isEmpty()) {
+			System.out.println(holder.poll());
+		}
+		input.close();
+		}
+		catch(Exception e)
+		{
+			System.out.println("File \"" + filename + "\" not found.");	
+			e.printStackTrace();
+		}
+	}
+	
+	public void deleteSavedBoard(String name) {
+		PrintWriter writer;
+		try {
+			String filename = "savedBoard.txt";
+			Queue<String> holder = new LinkedList<>();
+			File myFile = new File(filename);
+			try {
+				Scanner input = new Scanner(myFile);
+				while(input.hasNextLine()) {
+					String a = input.nextLine();
+					if(a.equals(name)) {
+						int row = input.nextInt();
+						input.nextLine();
+						int col = input.nextInt();
+						input.nextLine();
+						for(int i = 0; i < row*col+1; i++) {
+							input.nextLine();
+						}
+					}
+					else
+						holder.add(a+"");
+				}
+				input.close();
+			}
+			catch(Exception e) {
+				System.out.println("File \"" + filename + "\" not found.");	
+				e.printStackTrace();
+			}
+			writer = new PrintWriter(filename, "UTF-8");
+			while(!holder.isEmpty()) {
+				writer.println(holder.poll());
+			}
+			writer.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 }

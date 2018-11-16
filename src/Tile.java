@@ -30,8 +30,12 @@ public class Tile implements TileInterface{
 	//xwidth
 	//yheight
 	public Tile() {
+		if(currentNumber >= 10) {
+			currentNumber = 1;
+		}
 		this.value = currentNumber;
 		this.spin = "UP";
+		
 		currentNumber++;
 		setImageName();
 		setImage();
@@ -50,6 +54,9 @@ public class Tile implements TileInterface{
 	}
 	public int getValue() {
 		return value;
+	}
+	public void setValue(int value) {
+		this.value = value;
 	}
 	public void setXPosition(int x) {
 		xPosition = x;
@@ -117,5 +124,9 @@ public class Tile implements TileInterface{
 		else
 			return false;
 	}
+	public static void resetCurrentNumber() {
+		currentNumber = 1;
+	}
+	
 	
 }
