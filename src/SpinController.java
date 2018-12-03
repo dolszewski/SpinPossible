@@ -64,6 +64,8 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
     private int rowLength =0;
     private int colLength = 0;
     private int initialSpins = 0;
+    private boolean isFree;
+    private int[][] holderBoard;
 
 
 	public static void main(String[] args) {
@@ -215,6 +217,23 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		}
 
 		System.out.println("I won? " + theBoard.isIdentity());
+		if(theBoard.isIdentity() && !isFree) {
+			int option = JOptionPane.showConfirmDialog(gameJFrame, "You Won!!! \n It took " + (numberOfSpins) + " spins. \n Would you like to try again?", "", JOptionPane.YES_NO_OPTION);
+			if(option == JOptionPane.YES_OPTION) {
+				for(int i = 0; i < row; i++) {
+					for(int j = 0; j < column; j++) {
+						theBoard.getBoard()[i][j].setValue(holderBoard[i][j]);
+					}
+				}
+				emptySpinStack();
+				numberSelected = 0;
+				selectedArray = new int[2][2];
+				numberOfSpins = 0;
+				unHighlightTiles();
+			}
+			else
+				gameIsReady = false;
+		}
 
 		
 		theBoard.updatePositions();
@@ -326,10 +345,10 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource().equals(spinButton)) {
 			if(numberSelected > 0) {
-				spinStack.push(convert(selectedArray));
+				spinStack.push(convert(selectedArray,2,2));
 				numberSelectedStack.push(numberSelected);
-				spin();
 				numberOfSpins++;
+				spin();
 				System.out.println("Spin: " + numberOfSpins);
 			}
 			else
@@ -346,7 +365,7 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		if(e.getSource().equals(undoButton)) {
 			if(!spinStack.isEmpty()) {
 				unHighlightTiles();
-				selectedArray = convertBack(spinStack.pop());
+				selectedArray = convertBack(spinStack.pop(),2,2);
 				numberSelected = numberSelectedStack.pop();
 				highlightTiles();
 
@@ -370,21 +389,31 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		}
 		
 	}
-	public Integer[][] convert(int[][] a){
-		Integer[][] b = new Integer[2][2];
-		for(int i = 0; i < a.length; i++) {
-			for(int j = 0; j < a.length; j++) {
+	public Integer[][] convert(int[][] a, int row, int col){
+		Integer[][] b = new Integer[row][col];
+		for(int i = 0; i < row; i++) {
+			for(int j = 0; j < col; j++) {
 				b[i][j] = (int) a[i][j];
 			}
 		}
 		return b;
 	}
 	
-	public int[][] convertBack(Integer[][] a){
-		int[][] b = new int[2][2];
-		for(int i = 0; i < a.length; i++) {
-			for(int j = 0; j < a.length; j++) {
+	public int[][] convertBack(Integer[][] a, int row, int col){
+		int[][] b = new int[row][col];
+		for(int i = 0; i < row; i++) {
+			for(int j = 0; j < col; j++) {
 				b[i][j] = (int) a[i][j];
+			}
+		}
+		return b;
+	}
+	
+	public Tile[][] convertBoard(Tile[][] a, int row, int col){
+		Tile[][] b = new Tile[row][col];
+		for(int i = 0; i < row; i++) {
+			for(int j = 0; j < col; j++) {
+				b[i][j] = (Tile) a[i][j];
 			}
 		}
 		return b;
@@ -399,10 +428,10 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		initialSpins = numSpins;
 		for(int i = 0; i < numSpins; i++) {
 			unHighlightTiles();
-			tempSelectedArray[0][0] = randomNum.nextInt(3);
-			tempSelectedArray[0][1] = randomNum.nextInt(3);
-			tempSelectedArray[1][0] = randomNum.nextInt(3);
-			tempSelectedArray[1][1] = randomNum.nextInt(3);
+			tempSelectedArray[0][0] = randomNum.nextInt(row);
+			tempSelectedArray[0][1] = randomNum.nextInt(column);
+			tempSelectedArray[1][0] = randomNum.nextInt(row);
+			tempSelectedArray[1][1] = randomNum.nextInt(column);
 			selectedArray = tempSelectedArray;
 			numberSelected = 2;
 			highlightTiles();
@@ -423,10 +452,10 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		initialSpins = numSpins;
 		for(int i = 0; i < numSpins; i++) {
 			unHighlightTiles();
-			tempSelectedArray[0][0] = randomNum.nextInt(3);
-			tempSelectedArray[0][1] = randomNum.nextInt(3);
-			tempSelectedArray[1][0] = randomNum.nextInt(3);
-			tempSelectedArray[1][1] = randomNum.nextInt(3);
+			tempSelectedArray[0][0] = randomNum.nextInt(row);
+			tempSelectedArray[0][1] = randomNum.nextInt(column);
+			tempSelectedArray[1][0] = randomNum.nextInt(row);
+			tempSelectedArray[1][1] = randomNum.nextInt(column);
 			selectedArray = tempSelectedArray;
 			numberSelected = randomNum.nextInt(2)+1;
 			highlightTiles();
@@ -469,15 +498,28 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		String gamePlay = (String)JOptionPane.showInputDialog(gameJFrame, "Select Difficulty","Customized Dialog", JOptionPane.PLAIN_MESSAGE, null, difficulty, "Free");
 		theBoard = new Board(row, column);
 		if (gamePlay.equals("Easy")){
-			easyBoard();
+			while(theBoard.isIdentity())
+				easyBoard();
+			isFree = false;
 		} else if (gamePlay.equals("Hard")) {
-			hardBoard();
-		}
+			while(theBoard.isIdentity())
+				hardBoard();
+			isFree = false;
+		} else if (gamePlay.equals("Free"))
+			isFree = true;
 		rowLength = theBoard.getRowLength();
 		colLength = theBoard.getColLength();
 		emptySpinStack();
 		numberSelected = 0;
 		selectedArray = new int[2][2];
+		numberOfSpins = 0;
+		holderBoard = new int[row][column];
+		for(int i = 0; i < row; i++) {
+			for(int j = 0; j < column; j++) {
+				holderBoard[i][j] = theBoard.getBoard()[i][j].getValue();
+			}
+		}
+		holderBoard = convertBack(convert(holderBoard,row,column),row,column);
 		gameIsReady = true;
 		loadNames();
 	}
