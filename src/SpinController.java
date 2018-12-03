@@ -229,7 +229,7 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		for(int i =0; i< theBoard.getRows(); i++){
 			for (int j = 0; j< theBoard.getCols(); j++) {
 				theBoard.getBoard()[i][j].setHighlighted(false);
-				theBoard.getBoard()[i][j].setHighlighted(false);
+				theBoard.getBoard()[i][j].setFirstHighlight(false);
 			}
 		}
 	}
@@ -248,9 +248,9 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 	
 	@Override
 	public void highlightTiles() {
-		theBoard.getBoard()[selectedArray[0][0]][selectedArray[0][1]].setFirstHighlight(true);
 		if(numberSelected == 2) {
-			
+			theBoard.getBoard()[selectedArray[0][0]][selectedArray[0][1]].setFirstHighlight(true);
+			theBoard.getBoard()[selectedArray[1][0]][selectedArray[1][1]].setFirstHighlight(true);
 			int minA = min(selectedArray[0][0], selectedArray[1][0]);
 			int maxA = max(selectedArray[0][0], selectedArray[1][0]);
 			int minB = min(selectedArray[0][1], selectedArray[1][1]);
@@ -264,10 +264,13 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 			}
 		}
 		else if(numberSelected == 1) {
+			theBoard.getBoard()[selectedArray[0][0]][selectedArray[0][1]].setFirstHighlight(true);
 			theBoard.getBoard()[selectedArray[0][0]][selectedArray[0][1]].setHighlighted(true);
 		}
 
 	}
+	
+	
 	
 	public int min(int a, int b) {
 		if(a < b)
@@ -443,7 +446,7 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		while(!gameSetUpDone) {
 			int option = JOptionPane.showConfirmDialog(gameJFrame, options, "New Game", JOptionPane.OK_CANCEL_OPTION);
 			if (option != JOptionPane.CANCEL_OPTION){
-				if (Integer.parseInt(rows.getText()) > 3 || Integer.parseInt(columns.getText()) >3 ){
+				if (Integer.parseInt(rows.getText()) > 3 || Integer.parseInt(columns.getText()) >3){
 					JOptionPane.showMessageDialog(gameJFrame, "You did not enter valid rows or columns. Please enter an integer less than or equal to 3");
 				} else {
 					row = Integer.parseInt(rows.getText());
