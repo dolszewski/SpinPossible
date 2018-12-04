@@ -221,9 +221,17 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 			}
 			
 		}
-
+		
+		theBoard.updatePositions();
+		
+		gameJFrame.remove(textSpins);
+		textSpins = new JLabel("Spins: " + numberOfSpins);
+		textSpins.setBounds(gameWidth-150, 20,buttonSizeX, buttonSizeY);
+		textSpins.setFont(new Font("Monotype Corsiva",1,24));
+		gameJFrame.add(textSpins);
+		
 		System.out.println("I won? " + theBoard.isIdentity());
-		if(theBoard.isIdentity() && !isFree) {
+		if(theBoard.isIdentity() && !isFree && gameIsReady) {
 			int option = JOptionPane.showConfirmDialog(gameJFrame, "You Won!!! \n It took " + (numberOfSpins) + " spins. \n Would you like to try again?", "", JOptionPane.YES_NO_OPTION);
 			if(option == JOptionPane.YES_OPTION) {
 				for(int i = 0; i < row; i++) {
@@ -236,18 +244,20 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 				selectedArray = new int[2][2];
 				numberOfSpins = 0;
 				unHighlightTiles();
+				
+				
 			}
 			else
 				gameIsReady = false;
+			
+			gameJFrame.remove(textSpins);
+			textSpins = new JLabel("Spins: " + numberOfSpins);
+			textSpins.setBounds(gameWidth-150, 20,buttonSizeX, buttonSizeY);
+			textSpins.setFont(new Font("Monotype Corsiva",1,24));
+			gameJFrame.add(textSpins);
 		}
-
 		
-		theBoard.updatePositions();
-		gameJFrame.remove(textSpins);
-		textSpins = new JLabel("Spins: " + numberOfSpins);
-		textSpins.setBounds(gameWidth-150, 20,buttonSizeX, buttonSizeY);
-		textSpins.setFont(new Font("Monotype Corsiva",1,24));
-		gameJFrame.add(textSpins);
+		
 	}
 	public static int[][] copy(int[][] a){
 		int[][] temp = {{a[0][0],a[0][1]},{a[1][0],a[1][1]}};
@@ -454,7 +464,8 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		unHighlightTiles();
 		selectedArray = new int[2][2];
 		numberSelected = 0;
-		JOptionPane.showMessageDialog(gameJFrame, "Can beat " + initialSpins + " spins?");
+		if(row > 1 && column > 1)
+			JOptionPane.showMessageDialog(gameJFrame, "Can beat " + initialSpins + " spins?");
 	}
 	
 	public void hardBoard() {
@@ -478,7 +489,8 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		unHighlightTiles();
 		selectedArray = new int[2][2];
 		numberSelected = 0;
-		JOptionPane.showMessageDialog(gameJFrame, "Can beat " + initialSpins + " spins?");
+		if(row > 1 && column > 1)
+			JOptionPane.showMessageDialog(gameJFrame, "Can beat " + initialSpins + " spins?");
 	}
     
 	public void startGame() {
@@ -512,12 +524,14 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		String gamePlay = (String)JOptionPane.showInputDialog(gameJFrame, "Select Difficulty","Customized Dialog", JOptionPane.PLAIN_MESSAGE, null, difficulty, "Free");
 		theBoard = new Board(row, column);
 		if (gamePlay.equals("Easy")){
-			while(theBoard.isIdentity())
+			while(theBoard.isIdentity()) {
 				easyBoard();
+			}
 			isFree = false;
 		} else if (gamePlay.equals("Hard")) {
-			while(theBoard.isIdentity())
+			while(theBoard.isIdentity()) {
 				hardBoard();
+			}
 			isFree = false;
 		} else if (gamePlay.equals("Free"))
 			isFree = true;
@@ -534,6 +548,13 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 			}
 		}
 		holderBoard = convertBack(convert(holderBoard,row,column),row,column);
+		
+		gameJFrame.remove(textSpins);
+		textSpins = new JLabel("Spins: " + numberOfSpins);
+		textSpins.setBounds(gameWidth-150, 20,buttonSizeX, buttonSizeY);
+		textSpins.setFont(new Font("Monotype Corsiva",1,24));
+		gameJFrame.add(textSpins);
+		
 		gameIsReady = true;
 		loadNames();
 	}

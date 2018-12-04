@@ -86,8 +86,8 @@ public class Tile implements TileInterface{
 		}
 		
 	}
-	public void setFirstHighlight(boolean t) {
-		firstHighlight = t;
+	public void setFirstHighlight(boolean firstHighlight) {
+		this.firstHighlight = firstHighlight;
 	}
 	public void setImage() {
 		image = null;
@@ -118,8 +118,8 @@ public class Tile implements TileInterface{
 
 		}
 	}
-	public boolean equals(Tile a) {
-		if(a.getValue() == value) 
+	public boolean equals(Tile tile) {
+		if(tile.getValue() == value) 
 			return true;
 		else
 			return false;
