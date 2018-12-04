@@ -670,11 +670,21 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 	
 	public boolean isAName(String newName) {
 		String[] names = loadNames();
+		if(newName.length() > 20) {
+			JOptionPane.showMessageDialog(gameJFrame, "20 character max.");
+			return true;
+		}
 		for(int i = 0; i < names.length; i++) {
 			if(newName.equals(names[i])) {
+				JOptionPane.showMessageDialog(gameJFrame, "Name already taken.");
 				return true;
 			}
 		}
+		if(!newName.matches(".*[a-z].*")) {
+			JOptionPane.showMessageDialog(gameJFrame, "Must contain a letter (a-z).");
+			return true;
+		}
+		
 		return false;
 	}
 }
