@@ -20,6 +20,7 @@ import java.util.Stack;
 import java.util.TimerTask;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -66,6 +67,7 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
     private int initialSpins = 0;
     private boolean isFree;
     private int[][] holderBoard;
+    private JLabel textSpins;
 
 
 	public static void main(String[] args) {
@@ -108,6 +110,10 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		gameJFrame.setVisible(true);
 		gameTimer.schedule(this, 0, 40); 
 
+		textSpins = new JLabel("");
+		textSpins.setBounds(gameWidth-150, 20,buttonSizeX, buttonSizeY);
+		textSpins.setFont(new Font("Monotype Corsiva",1,24));
+		gameJFrame.add(textSpins);
 		
 	}
 	private class myPane extends JPanel {
@@ -237,6 +243,11 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 
 		
 		theBoard.updatePositions();
+		gameJFrame.remove(textSpins);
+		textSpins = new JLabel("Spins: " + numberOfSpins);
+		textSpins.setBounds(gameWidth-150, 20,buttonSizeX, buttonSizeY);
+		textSpins.setFont(new Font("Monotype Corsiva",1,24));
+		gameJFrame.add(textSpins);
 	}
 	public static int[][] copy(int[][] a){
 		int[][] temp = {{a[0][0],a[0][1]},{a[1][0],a[1][1]}};
@@ -351,8 +362,10 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 				spin();
 				System.out.println("Spin: " + numberOfSpins);
 			}
-			else
+			else {
 				System.out.println("Nothing to spin!");
+				JOptionPane.showMessageDialog(gameJFrame, "Nothing to spin! Select a tile first.");
+			}
 		}
 		if( e.getSource().equals(exitItem)) {
 			saveBoard("Test");
@@ -368,14 +381,15 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 				selectedArray = convertBack(spinStack.pop(),2,2);
 				numberSelected = numberSelectedStack.pop();
 				highlightTiles();
-
-				spin();
 				numberOfSpins--;
+				spin();
 				System.out.println("Spin: " + numberOfSpins);
 
 			}
-			else
+			else {
 				System.out.println("Nothing to undo!");
+				JOptionPane.showMessageDialog(gameJFrame, "Nothing to undo! Must spin first.");
+			}
 		}
 		
 	}
@@ -440,7 +454,7 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		unHighlightTiles();
 		selectedArray = new int[2][2];
 		numberSelected = 0;
-		System.out.println("Can beat " + initialSpins + " spins?");
+		JOptionPane.showMessageDialog(gameJFrame, "Can beat " + initialSpins + " spins?");
 	}
 	
 	public void hardBoard() {
@@ -464,7 +478,7 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		unHighlightTiles();
 		selectedArray = new int[2][2];
 		numberSelected = 0;
-		System.out.println("Can beat " + initialSpins + " spins?");
+		JOptionPane.showMessageDialog(gameJFrame, "Can beat " + initialSpins + " spins?");
 	}
     
 	public void startGame() {
