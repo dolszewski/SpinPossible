@@ -20,6 +20,7 @@ import java.util.Stack;
 import java.util.TimerTask;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -68,6 +69,9 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
     private int colLength = 0;
     private int initialSpins = 0;
     private boolean gameInProgress;
+    private boolean isFree;
+    private int[][] holderBoard;
+    private JLabel textSpins;
 
 
 	public static void main(String[] args) {
@@ -114,7 +118,7 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
         menu.add(exitItem);
         menu.add(saveGame);
         menu.add(loadGame);
-        
+        menu.add(deleteBoard);
         menu.setText("Menu");
         menuBar = new JMenuBar();
         menuBar.add(menu);
@@ -122,6 +126,10 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		gameJFrame.setVisible(true);
 		gameTimer.schedule(this, 0, 40); 
 
+		textSpins = new JLabel("");
+		textSpins.setBounds(gameWidth-150, 20,buttonSizeX, buttonSizeY);
+		textSpins.setFont(new Font("Monotype Corsiva",1,24));
+		gameJFrame.add(textSpins);
 		
 	}
 	private class myPane extends JPanel {
@@ -229,11 +237,43 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 			}
 			
 		}
-
-		System.out.println("I won? " + theBoard.isIdentity());
-
 		
 		theBoard.updatePositions();
+		
+		gameJFrame.remove(textSpins);
+		textSpins = new JLabel("Spins: " + numberOfSpins);
+		textSpins.setBounds(gameWidth-150, 20,buttonSizeX, buttonSizeY);
+		textSpins.setFont(new Font("Monotype Corsiva",1,24));
+		gameJFrame.add(textSpins);
+		
+		System.out.println("I won? " + theBoard.isIdentity());
+		if(theBoard.isIdentity() && !isFree && gameIsReady) {
+			int option = JOptionPane.showConfirmDialog(gameJFrame, "You Won!!! \n It took " + (numberOfSpins) + " spins. \n Would you like to try again?", "", JOptionPane.YES_NO_OPTION);
+			if(option == JOptionPane.YES_OPTION) {
+				for(int i = 0; i < row; i++) {
+					for(int j = 0; j < column; j++) {
+						theBoard.getBoard()[i][j].setValue(holderBoard[i][j]);
+					}
+				}
+				emptySpinStack();
+				numberSelected = 0;
+				selectedArray = new int[2][2];
+				numberOfSpins = 0;
+				unHighlightTiles();
+				
+				
+			}
+			else
+				gameIsReady = false;
+			
+			gameJFrame.remove(textSpins);
+			textSpins = new JLabel("Spins: " + numberOfSpins);
+			textSpins.setBounds(gameWidth-150, 20,buttonSizeX, buttonSizeY);
+			textSpins.setFont(new Font("Monotype Corsiva",1,24));
+			gameJFrame.add(textSpins);
+		}
+		
+		
 	}
 	public static int[][] copy(int[][] a){
 		int[][] temp = {{a[0][0],a[0][1]},{a[1][0],a[1][1]}};
@@ -245,7 +285,7 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		for(int i =0; i< theBoard.getRows(); i++){
 			for (int j = 0; j< theBoard.getCols(); j++) {
 				theBoard.getBoard()[i][j].setHighlighted(false);
-				theBoard.getBoard()[i][j].setHighlighted(false);
+				theBoard.getBoard()[i][j].setFirstHighlight(false);
 			}
 		}
 	}
@@ -264,9 +304,9 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 	
 	@Override
 	public void highlightTiles() {
-		theBoard.getBoard()[selectedArray[0][0]][selectedArray[0][1]].setFirstHighlight(true);
 		if(numberSelected == 2) {
-			
+			theBoard.getBoard()[selectedArray[0][0]][selectedArray[0][1]].setFirstHighlight(true);
+			theBoard.getBoard()[selectedArray[1][0]][selectedArray[1][1]].setFirstHighlight(true);
 			int minA = min(selectedArray[0][0], selectedArray[1][0]);
 			int maxA = max(selectedArray[0][0], selectedArray[1][0]);
 			int minB = min(selectedArray[0][1], selectedArray[1][1]);
@@ -280,10 +320,13 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 			}
 		}
 		else if(numberSelected == 1) {
+			theBoard.getBoard()[selectedArray[0][0]][selectedArray[0][1]].setFirstHighlight(true);
 			theBoard.getBoard()[selectedArray[0][0]][selectedArray[0][1]].setHighlighted(true);
 		}
 
 	}
+	
+	
 	
 	public int min(int a, int b) {
 		if(a < b)
@@ -339,14 +382,16 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource().equals(spinButton)) {
 			if(numberSelected > 0) {
-				spinStack.push(convert(selectedArray));
+				spinStack.push(convert(selectedArray,2,2));
 				numberSelectedStack.push(numberSelected);
-				spin();
 				numberOfSpins++;
+				spin();
 				System.out.println("Spin: " + numberOfSpins);
 			}
-			else
+			else {
 				System.out.println("Nothing to spin!");
+				JOptionPane.showMessageDialog(gameJFrame, "Nothing to spin! Select a tile first.");
+			}
 		}
 		if( e.getSource().equals(exitItem)) {
 			exitGame();
@@ -359,22 +404,27 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		if(e.getSource().equals(undoButton)) {
 			if(!spinStack.isEmpty()) {
 				unHighlightTiles();
-				selectedArray = convertBack(spinStack.pop());
+				selectedArray = convertBack(spinStack.pop(),2,2);
 				numberSelected = numberSelectedStack.pop();
 				highlightTiles();
-
-				spin();
 				numberOfSpins--;
+				spin();
 				System.out.println("Spin: " + numberOfSpins);
 
 			}
-			else
+			else {
 				System.out.println("Nothing to undo!");
+				JOptionPane.showMessageDialog(gameJFrame, "Nothing to undo! Must spin first.");
+			}
 		}
 		if (e.getSource().equals(loadGame)) {
 			String[] names = loadNames();
-			String filename = (String) JOptionPane.showInputDialog(gameJFrame, "Select a note", "Customized Dialog", JOptionPane.PLAIN_MESSAGE, null, names, names[0]);
-			loadBoard(filename);
+			if (names[0] != null) {
+				String filename = (String) JOptionPane.showInputDialog(gameJFrame, "Select a note", "Customized Dialog", JOptionPane.PLAIN_MESSAGE, null, names, names[0]);
+				loadBoard(filename);
+			} else {
+				JOptionPane.showMessageDialog(gameJFrame, "Nothing to load. Play a game!");
+			}
 			
 		}
 		if (e.getSource().equals(saveGame)) {
@@ -394,8 +444,12 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		}
 		if (e.getSource().equals(deleteBoard)) {
 			String[] names = loadNames();
-			String filename = (String) JOptionPane.showInputDialog(gameJFrame, "Select a note", "Customized Dialog", JOptionPane.PLAIN_MESSAGE, null, names, names[0]);
-			deleteSavedBoard(filename);
+			if (names != null) {
+				String filename = (String) JOptionPane.showInputDialog(gameJFrame, "Select a note", "Customized Dialog", JOptionPane.PLAIN_MESSAGE, null, names, names[0]);
+				deleteSavedBoard(filename);
+			} else {
+				JOptionPane.showMessageDialog(gameJFrame, "Nothing to delete. Play a game!");
+			}
 		}
 		
 	}
@@ -409,21 +463,31 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		}
 		
 	}
-	public Integer[][] convert(int[][] a){
-		Integer[][] b = new Integer[2][2];
-		for(int i = 0; i < a.length; i++) {
-			for(int j = 0; j < a.length; j++) {
+	public Integer[][] convert(int[][] a, int row, int col){
+		Integer[][] b = new Integer[row][col];
+		for(int i = 0; i < row; i++) {
+			for(int j = 0; j < col; j++) {
 				b[i][j] = (int) a[i][j];
 			}
 		}
 		return b;
 	}
 	
-	public int[][] convertBack(Integer[][] a){
-		int[][] b = new int[2][2];
-		for(int i = 0; i < a.length; i++) {
-			for(int j = 0; j < a.length; j++) {
+	public int[][] convertBack(Integer[][] a, int row, int col){
+		int[][] b = new int[row][col];
+		for(int i = 0; i < row; i++) {
+			for(int j = 0; j < col; j++) {
 				b[i][j] = (int) a[i][j];
+			}
+		}
+		return b;
+	}
+	
+	public Tile[][] convertBoard(Tile[][] a, int row, int col){
+		Tile[][] b = new Tile[row][col];
+		for(int i = 0; i < row; i++) {
+			for(int j = 0; j < col; j++) {
+				b[i][j] = (Tile) a[i][j];
 			}
 		}
 		return b;
@@ -438,10 +502,10 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		initialSpins = numSpins;
 		for(int i = 0; i < numSpins; i++) {
 			unHighlightTiles();
-			tempSelectedArray[0][0] = randomNum.nextInt(3);
-			tempSelectedArray[0][1] = randomNum.nextInt(3);
-			tempSelectedArray[1][0] = randomNum.nextInt(3);
-			tempSelectedArray[1][1] = randomNum.nextInt(3);
+			tempSelectedArray[0][0] = randomNum.nextInt(row);
+			tempSelectedArray[0][1] = randomNum.nextInt(column);
+			tempSelectedArray[1][0] = randomNum.nextInt(row);
+			tempSelectedArray[1][1] = randomNum.nextInt(column);
 			selectedArray = tempSelectedArray;
 			numberSelected = 2;
 			highlightTiles();
@@ -450,7 +514,8 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		unHighlightTiles();
 		selectedArray = new int[2][2];
 		numberSelected = 0;
-		System.out.println("Can beat " + initialSpins + " spins?");
+		if(row > 1 && column > 1)
+			JOptionPane.showMessageDialog(gameJFrame, "Can beat " + initialSpins + " spins?");
 	}
 	
 	public void hardBoard() {
@@ -462,10 +527,10 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		initialSpins = numSpins;
 		for(int i = 0; i < numSpins; i++) {
 			unHighlightTiles();
-			tempSelectedArray[0][0] = randomNum.nextInt(3);
-			tempSelectedArray[0][1] = randomNum.nextInt(3);
-			tempSelectedArray[1][0] = randomNum.nextInt(3);
-			tempSelectedArray[1][1] = randomNum.nextInt(3);
+			tempSelectedArray[0][0] = randomNum.nextInt(row);
+			tempSelectedArray[0][1] = randomNum.nextInt(column);
+			tempSelectedArray[1][0] = randomNum.nextInt(row);
+			tempSelectedArray[1][1] = randomNum.nextInt(column);
 			selectedArray = tempSelectedArray;
 			numberSelected = randomNum.nextInt(2)+1;
 			highlightTiles();
@@ -474,7 +539,8 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		unHighlightTiles();
 		selectedArray = new int[2][2];
 		numberSelected = 0;
-		System.out.println("Can beat " + initialSpins + " spins?");
+		if(row > 1 && column > 1)
+			JOptionPane.showMessageDialog(gameJFrame, "Can beat " + initialSpins + " spins?");
 	}
     
 	public void startGame() {
@@ -485,6 +551,7 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		while(!gameSetUpDone) {
 			int option = JOptionPane.showConfirmDialog(gameJFrame, options, "New Game", JOptionPane.OK_CANCEL_OPTION);
 			if (option != JOptionPane.CANCEL_OPTION){
+
 				if (option == -1) {
 					if (!gameInProgress) {
 						row = 3;
@@ -495,6 +562,7 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 					}
 				}
 				else if(rows.getText().isEmpty() ||columns.getText().isEmpty() ){
+
 					JOptionPane.showMessageDialog(gameJFrame, "You did not enter valid rows or columns. Please enter an integer less than or equal to 3");
 
 				}else if (Integer.parseInt(rows.getText()) > 3 || Integer.parseInt(columns.getText()) >3 ){
@@ -533,12 +601,30 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 			emptySpinStack();
 			numberSelected = 0;
 			selectedArray = new int[2][2];
+			numberOfSpins = 0;
+			holderBoard = new int[row][column];
+			for(int i = 0; i < row; i++) {
+				for(int j = 0; j < column; j++) {
+					holderBoard[i][j] = theBoard.getBoard()[i][j].getValue();
+				}
+			}
+			holderBoard = convertBack(convert(holderBoard,row,column),row,column);
+			
+			gameJFrame.remove(textSpins);
+			textSpins = new JLabel("Spins: " + numberOfSpins);
+			textSpins.setBounds(gameWidth-150, 20,buttonSizeX, buttonSizeY);
+			textSpins.setFont(new Font("Monotype Corsiva",1,24));
+			gameJFrame.add(textSpins);
+			
+			gameIsReady = true;
+			selectedArray = new int[2][2];
 			gameIsReady = true;
 			gameInProgress = true;
 			loadNames();
 		}
 	
 		}
+
 	
 	public void saveBoard(String name) {
 		PrintWriter writer;
@@ -686,11 +772,21 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 	
 	public boolean isAName(String newName) {
 		String[] names = loadNames();
+		if(newName.length() > 20) {
+			JOptionPane.showMessageDialog(gameJFrame, "20 character max.");
+			return true;
+		}
 		for(int i = 0; i < names.length; i++) {
 			if(newName.equals(names[i])) {
+				JOptionPane.showMessageDialog(gameJFrame, "Name already taken.");
 				return true;
 			}
 		}
+		if(!newName.matches(".*[a-z].*")) {
+			JOptionPane.showMessageDialog(gameJFrame, "Must contain a letter (a-z).");
+			return true;
+		}
+		
 		return false;
 	}
 	public void exitGame() {

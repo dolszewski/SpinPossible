@@ -47,6 +47,9 @@ public class Board implements BoardInterface{
     public Tile[][] getBoard() {
 		return board;
 	}
+    public void setBoard(Tile[][] board) {
+    		this.board = board;
+    }
 	public int getRows() {
 		return rows;
 	}
