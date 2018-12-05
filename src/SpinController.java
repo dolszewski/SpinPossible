@@ -419,7 +419,7 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		}
 		if (e.getSource().equals(loadGame)) {
 			String[] names = loadNames();
-			if (names[0] != null) {
+			if (names != null) {
 				String filename = (String) JOptionPane.showInputDialog(gameJFrame, "Select a note", "Customized Dialog", JOptionPane.PLAIN_MESSAGE, null, names, names[0]);
 				loadBoard(filename);
 			} else {
@@ -704,17 +704,24 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		try
 		{
 		Scanner input = new Scanner(myFile);
+		boolean enteredWhile = false;
+		
 		while(input.hasNextLine()) {
 			String a = input.nextLine();
 			if(a.contains("_")) {
 				holder.add(a.substring(0, a.length()-1));
 			}
+			if (!enteredWhile){
+				enteredWhile = true;
+			}
+		}
+		if (!enteredWhile) {
+			return null;
 		}
 		String[] a = new String[holder.size()];
 		int i = 0;
 		while(!holder.isEmpty()) {
 			a[i] = holder.poll();
-			System.out.println(a[i]);
 			i++;
 		}
 		input.close();
@@ -772,6 +779,9 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 	
 	public boolean isAName(String newName) {
 		String[] names = loadNames();
+		if (names == null) {
+			return false;
+		}
 		if(newName.length() > 20) {
 			JOptionPane.showMessageDialog(gameJFrame, "20 character max.");
 			return true;
