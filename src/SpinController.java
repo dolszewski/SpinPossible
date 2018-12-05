@@ -56,6 +56,9 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
     private JMenu menu;
     private JMenuItem newGameItem;
     private JMenuItem exitItem;
+    private JMenuItem saveGame;
+    private JMenuItem loadGame;
+    private JMenuItem deleteBoard;
     private Object options[] = {"1", "2", "3"};
     private int numberHighlightedTiles = 0;
     private int numberOfSpins = 0;
@@ -64,6 +67,7 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
     private int rowLength =0;
     private int colLength = 0;
     private int initialSpins = 0;
+    private boolean gameInProgress;
 
 
 	public static void main(String[] args) {
@@ -96,9 +100,21 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
         exitItem = new JMenuItem();
         exitItem.setText("Exit");
         exitItem.addActionListener(this);
+        saveGame = new JMenuItem();
+        saveGame.setText("Save Game");
+        saveGame.addActionListener(this);
+        loadGame = new JMenuItem();
+        loadGame.setText("Load Game");
+        loadGame.addActionListener(this);
+        deleteBoard = new JMenuItem();
+        deleteBoard.setText("Delete Game");
+        deleteBoard.addActionListener(this);
         menu = new JMenu();
         menu.add(newGameItem);
         menu.add(exitItem);
+        menu.add(saveGame);
+        menu.add(loadGame);
+        
         menu.setText("Menu");
         menuBar = new JMenuBar();
         menuBar.add(menu);
@@ -333,8 +349,8 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 				System.out.println("Nothing to spin!");
 		}
 		if( e.getSource().equals(exitItem)) {
-			saveBoard("Test");
-			System.exit(0);
+			exitGame();
+			
 		}
 		if(e.getSource().equals(newGameItem)){
 			emptySpinStack(); //Need to write this function
@@ -354,6 +370,32 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 			}
 			else
 				System.out.println("Nothing to undo!");
+		}
+		if (e.getSource().equals(loadGame)) {
+			String[] names = loadNames();
+			String filename = (String) JOptionPane.showInputDialog(gameJFrame, "Select a note", "Customized Dialog", JOptionPane.PLAIN_MESSAGE, null, names, names[0]);
+			loadBoard(filename);
+			
+		}
+		if (e.getSource().equals(saveGame)) {
+			boolean goodName = false;
+			String name = "";
+			while (!goodName){
+				name = JOptionPane.showInputDialog(gameJFrame, "Please enter a name to save");
+				goodName = (!isAName(name) && validateName(name));
+				if (!goodName) {
+					JOptionPane.showMessageDialog(gameJFrame, "That name is already taken or not a valid name");
+				}
+			}
+			if (!name.isEmpty()){
+				saveBoard(name);
+				exitGame();
+			}
+		}
+		if (e.getSource().equals(deleteBoard)) {
+			String[] names = loadNames();
+			String filename = (String) JOptionPane.showInputDialog(gameJFrame, "Select a note", "Customized Dialog", JOptionPane.PLAIN_MESSAGE, null, names, names[0]);
+			deleteSavedBoard(filename);
 		}
 		
 	}
@@ -443,7 +485,16 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		while(!gameSetUpDone) {
 			int option = JOptionPane.showConfirmDialog(gameJFrame, options, "New Game", JOptionPane.OK_CANCEL_OPTION);
 			if (option != JOptionPane.CANCEL_OPTION){
-				if(rows.getText().isEmpty() ||columns.getText().isEmpty() ){
+				if (option == -1) {
+					if (!gameInProgress) {
+						row = 3;
+						column = 3;
+						gameSetUpDone = true;
+					} else {
+						gameSetUpDone = true;
+					}
+				}
+				else if(rows.getText().isEmpty() ||columns.getText().isEmpty() ){
 					JOptionPane.showMessageDialog(gameJFrame, "You did not enter valid rows or columns. Please enter an integer less than or equal to 3");
 
 				}else if (Integer.parseInt(rows.getText()) > 3 || Integer.parseInt(columns.getText()) >3 ){
@@ -451,30 +502,43 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 				} else {
 					row = Integer.parseInt(rows.getText());
 					column = Integer.parseInt(columns.getText());
+					gameIsReady = false;
 					gameSetUpDone = true;
 				}
 				
 			} else {
-				
+				if (option == 2){
+				exitGame();
+			
+				}
 			}
 		}
-		
-		Object[] difficulty = {"Free", "Easy","Hard"};
-		String gamePlay = (String)JOptionPane.showInputDialog(gameJFrame, "Select Difficulty","Customized Dialog", JOptionPane.PLAIN_MESSAGE, null, difficulty, "Free");
-		theBoard = new Board(row, column);
-		if (gamePlay.equals("Easy")){
-			easyBoard();
-		} else if (gamePlay.equals("Hard")) {
-			hardBoard();
+		if (!gameInProgress && !gameIsReady){
+			Object[] difficulty = {"Free", "Easy","Hard"};
+			String gamePlay = (String)JOptionPane.showInputDialog(gameJFrame, "Select Difficulty","Customized Dialog", JOptionPane.PLAIN_MESSAGE, null, difficulty, "Free");
+			
+			theBoard = new Board(row, column);
+			if (gamePlay==null) {
+				gamePlay = "Free";
+			}
+			if (gamePlay.equals("Easy")){
+				easyBoard();
+			} else if (gamePlay.equals("Hard")) {
+				hardBoard();
+			} else if (!gamePlay.equals("Free")){
+				exitGame();
+			}
+			rowLength = theBoard.getRowLength();
+			colLength = theBoard.getColLength();
+			emptySpinStack();
+			numberSelected = 0;
+			selectedArray = new int[2][2];
+			gameIsReady = true;
+			gameInProgress = true;
+			loadNames();
 		}
-		rowLength = theBoard.getRowLength();
-		colLength = theBoard.getColLength();
-		emptySpinStack();
-		numberSelected = 0;
-		selectedArray = new int[2][2];
-		gameIsReady = true;
-		loadNames();
-	}
+	
+		}
 	
 	public void saveBoard(String name) {
 		PrintWriter writer;
@@ -628,5 +692,21 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 			}
 		}
 		return false;
+	}
+	public void exitGame() {
+		int option = JOptionPane.showConfirmDialog(gameJFrame, "Exit Game?", null, JOptionPane.YES_NO_OPTION);
+		if (option == JOptionPane.YES_OPTION) {
+			System.exit(0);
+		} else {
+			return;
+		}
+	}
+	public boolean validateName(String a){
+		a = a.trim();
+		if (a.matches("^[a-zA-Z0-9_]+$")) {
+			  return true;
+			} else {
+				return false;
+			}
 	}
 }
