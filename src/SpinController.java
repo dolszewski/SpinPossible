@@ -421,7 +421,9 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 			String[] names = loadNames();
 			if (names != null) {
 				String filename = (String) JOptionPane.showInputDialog(gameJFrame, "Select a note", "Customized Dialog", JOptionPane.PLAIN_MESSAGE, null, names, names[0]);
-				loadBoard(filename);
+				
+					loadBoard(filename);
+				
 			} else {
 				JOptionPane.showMessageDialog(gameJFrame, "Nothing to load. Play a game!");
 			}
@@ -429,16 +431,28 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		}
 		if (e.getSource().equals(saveGame)) {
 			boolean goodName = false;
-			String name = "";
+			boolean emptyName = false;
+			String aname ="";
+			String name;
 			while (!goodName){
 				name = JOptionPane.showInputDialog(gameJFrame, "Please enter a name to save");
-				goodName = (!isAName(name) && validateName(name));
-				if (!goodName) {
-					JOptionPane.showMessageDialog(gameJFrame, "That name is already taken or not a valid name");
+				
+				if(name == null) {
+					emptyName = true;
+					goodName = true;
+				} else {
+					goodName = (!isAName(name) && validateName(name));
+					if (!goodName) {
+						JOptionPane.showMessageDialog(gameJFrame, "That name is already taken or not a valid name");
+					} else {
+						aname = name;
+					}
 				}
+				
 			}
-			if (!name.isEmpty()){
-				saveBoard(name);
+			
+			if (!emptyName){
+				saveBoard(aname);
 				exitGame();
 			}
 		}
@@ -672,23 +686,30 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		try
 		{
 		Scanner input = new Scanner(myFile);
-		if(input.nextLine().equals(name)) {
-			int row = input.nextInt();
-			input.nextLine();
-			int col = input.nextInt();
-			input.nextLine();
-			numberOfSpins = input.nextInt();
-			theBoard = new Board(row, col);
-			for(int i = 0; i < row; i++) {
-				for(int j = 0; j < col; j++) {
-					theBoard.getBoard()[i][j].setValue(input.nextInt());
-					input.nextLine();
-				}
-			 }
-			 
+		while(input.hasNextLine()) {
+			if(input.nextLine().equals(name+"_")) {
+				int row = input.nextInt();
+				input.nextLine();
+				int col = input.nextInt();
+				input.nextLine();
+				numberOfSpins = input.nextInt();
+				theBoard = new Board(row, col);
+				for(int i = 0; i < row; i++) {
+					for(int j = 0; j < col; j++) {
+						theBoard.getBoard()[i][j].setValue(input.nextInt());
+						input.nextLine();
+					}
+				 }
+				 
+			}
 		}
-		
 		input.close();
+		theBoard.updatePositions();
+		gameJFrame.remove(textSpins);
+		textSpins = new JLabel("Spins: " + numberOfSpins);
+		textSpins.setBounds(gameWidth-150, 20,buttonSizeX, buttonSizeY);
+		textSpins.setFont(new Font("Monotype Corsiva",1,24));
+		gameJFrame.add(textSpins);
 		}
 		catch(Exception e)
 		{
@@ -716,6 +737,7 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 			}
 		}
 		if (!enteredWhile) {
+			input.close();
 			return null;
 		}
 		String[] a = new String[holder.size()];
@@ -745,7 +767,7 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 				Scanner input = new Scanner(myFile);
 				while(input.hasNextLine()) {
 					String a = input.nextLine();
-					if(a.equals(name)) {
+					if(a.equals(name+"_")) {
 						int row = input.nextInt();
 						input.nextLine();
 						int col = input.nextInt();
