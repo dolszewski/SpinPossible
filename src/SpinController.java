@@ -263,8 +263,10 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 				
 				
 			}
-			else
+			else {
 				gameIsReady = false;
+				gameInProgress = false;
+			}
 			
 			gameJFrame.remove(textSpins);
 			textSpins = new JLabel("Spins: " + numberOfSpins);
@@ -602,6 +604,7 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 			theBoard = new Board(row, column);
 			if (gamePlay==null) {
 				gamePlay = "Free";
+				isFree = true;
 			}
 			if (gamePlay.equals("Easy")){
 				easyBoard();
@@ -609,6 +612,8 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 				hardBoard();
 			} else if (!gamePlay.equals("Free")){
 				exitGame();
+			} else {
+				isFree = true;
 			}
 			rowLength = theBoard.getRowLength();
 			colLength = theBoard.getColLength();
@@ -633,7 +638,10 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 			gameIsReady = true;
 			selectedArray = new int[2][2];
 			gameIsReady = true;
-			gameInProgress = true;
+			if (row != 1 && column != 1) {
+				gameInProgress = true;
+			}
+			
 			loadNames();
 		}
 	
