@@ -567,9 +567,15 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		if (!gameIsReady){
 			Object[] difficulty = {"Free", "Easy","Hard"};
 			String gamePlay = (String)JOptionPane.showInputDialog(gameJFrame, "Select Difficulty","Customized Dialog", JOptionPane.PLAIN_MESSAGE, null, difficulty, "Free");
+
 			if (gamePlay==null && !gameInProgress) {
 				gamePlay = "Free";
 				isFree = true;
+				theBoard = new Board(row, column);
+				rowLength = theBoard.getRowLength();
+				colLength = theBoard.getColLength();
+				gamePlaying = true;
+				gameInProgress = true;
 			}else if (gamePlay == null) {
 				
 			}else if (!gamePlaying && (!gamePlay.equals("Easy") && !gamePlay.equals("Hard") && !gamePlay.equals("Free"))) {
