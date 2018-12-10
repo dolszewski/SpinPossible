@@ -826,6 +826,7 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		boolean gameSetUpDone = false;
 		while(!gameSetUpDone) {
 			int option = JOptionPane.showConfirmDialog(gameJFrame, options, "New Game", JOptionPane.OK_CANCEL_OPTION);
+			try {
 			if (option != JOptionPane.CANCEL_OPTION){
 
 				if (option == -1) {
@@ -854,6 +855,9 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 
 			} else {
 				return true;
+			}
+			} catch (NumberFormatException e) {
+				JOptionPane.showMessageDialog(gameJFrame, "You did not enter valid rows or columns. Please enter an integer less than or equal to 3");
 			}
 		}
 		return false;
