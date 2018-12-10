@@ -173,8 +173,6 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		// TODO Auto-generated method stub
 		int x = e.getX();
 		int y = e.getY();
-
-		
 		if (y < rowLength && x < colLength) {
 			unHighlightTiles();
 			selected(theBoard.colSelect(y, rowLength),theBoard.rowSelect(x, colLength));
@@ -572,14 +570,16 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 			if (gamePlay==null && !gameInProgress) {
 				gamePlay = "Free";
 				isFree = true;
-			}else if (!gamePlaying) {
+			}else if (gamePlay == null) {
+				
+			}else if (!gamePlaying && (!gamePlay.equals("Easy") && !gamePlay.equals("Hard") && !gamePlay.equals("Free"))) {
 				isFree = true;
 				theBoard = new Board(row, column);
+				rowLength = theBoard.getRowLength();
+				colLength = theBoard.getColLength();
 				gamePlaying = true;
 				gameInProgress = true;
 
-			}else if (gamePlay == null) {
-				
 			}
 			else if (gamePlay.equals("Easy") || gamePlay.equals("Hard") || gamePlay.equals("Free")) {
 				theBoard = new Board(row, column);
@@ -866,6 +866,8 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		row = 3;
 		column = 3;
 		theBoard = new Board(row, column);
+		rowLength = theBoard.getRowLength();
+		colLength = theBoard.getColLength();
 		gamePlaying = true;
 		isFree = true;
 	}
