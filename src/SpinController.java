@@ -246,7 +246,7 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		gameJFrame.add(textSpins);
 		
 		//System.out.println("I won? " + theBoard.isIdentity());
-		if(theBoard.isIdentity() && !isFree && gameIsReady) {
+		if(theBoard.isIdentity() && !isFree && gamePlaying) {
 			int option = JOptionPane.showConfirmDialog(gameJFrame, "You Won!!! \n It took " + (numberOfSpins) + " spins. \n Would you like to try again?", "", JOptionPane.YES_NO_OPTION);
 			if(option == JOptionPane.YES_OPTION) {
 				for(int i = 0; i < row; i++) {
