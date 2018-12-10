@@ -38,6 +38,7 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
     private JFrame gameJFrame;
     private JPanel gameContentPane;
     private boolean gameIsReady = false;
+    private boolean gamePlaying = false;
     private Stack<Integer[][]> spinStack = new Stack<Integer[][]>();
     private Stack<Integer> numberSelectedStack = new Stack<Integer>();
     private Stack<Board> undoBoard = new Stack<Board>();
@@ -142,7 +143,7 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		@Override
 		public void paintComponent(Graphics g) {
 			super.paintComponent(g);
-			if (gameIsReady){
+			if (gamePlaying){
 				theBoard.drawBoard(g);
 			}
 		}
@@ -150,7 +151,7 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
-		if (gameIsReady) {
+		if (gamePlaying) {
 		    gameJFrame.repaint();
 		    gameContentPane.repaint();
 		} else {
@@ -246,7 +247,7 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 		textSpins.setFont(new Font("Monotype Corsiva",1,24));
 		gameJFrame.add(textSpins);
 		
-		System.out.println("I won? " + theBoard.isIdentity());
+		//System.out.println("I won? " + theBoard.isIdentity());
 		if(theBoard.isIdentity() && !isFree && gameIsReady) {
 			int option = JOptionPane.showConfirmDialog(gameJFrame, "You Won!!! \n It took " + (numberOfSpins) + " spins. \n Would you like to try again?", "", JOptionPane.YES_NO_OPTION);
 			if(option == JOptionPane.YES_OPTION) {
@@ -265,7 +266,7 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 			}
 			else {
 				gameIsReady = false;
-				gameInProgress = false;
+				//gameInProgress = false;
 			}
 			
 			gameJFrame.remove(textSpins);
@@ -560,90 +561,63 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 	}
     
 	public void startGame() {
-		JTextField rows = new JTextField();
-		JTextField columns = new JTextField();
-		Object[] options = {"Rows:", rows, "Columns: ", columns};
-		boolean gameSetUpDone = false;
-		while(!gameSetUpDone) {
-			int option = JOptionPane.showConfirmDialog(gameJFrame, options, "New Game", JOptionPane.OK_CANCEL_OPTION);
-			if (option != JOptionPane.CANCEL_OPTION){
-
-				if (option == -1) {
-					if (!gameInProgress) {
-						row = 3;
-						column = 3;
-						gameSetUpDone = true;
-					} else {
-						gameSetUpDone = true;
-					}
-				}
-				else if(rows.getText().isEmpty() ||columns.getText().isEmpty() ){
-
-					JOptionPane.showMessageDialog(gameJFrame, "You did not enter valid rows or columns. Please enter an integer less than or equal to 3");
-
-				}else if (Integer.parseInt(rows.getText()) > 3 || Integer.parseInt(columns.getText()) >3 ){
-					JOptionPane.showMessageDialog(gameJFrame, "You did not enter valid rows or columns. Please enter an integer less than or equal to 3");
-				} else {
-					row = Integer.parseInt(rows.getText());
-					column = Integer.parseInt(columns.getText());
-					gameIsReady = false;
-					gameSetUpDone = true;
-				}
-				
-			} else {
-				if (option == 2){
-				exitGame();
-			
-				}
-			}
-		}
-		if (!gameInProgress && !gameIsReady){
+		
+		
+		boolean exit = false;
+		gameIsReady = getRowsAndColumns();
+		
+		if (!gameIsReady){
 			Object[] difficulty = {"Free", "Easy","Hard"};
 			String gamePlay = (String)JOptionPane.showInputDialog(gameJFrame, "Select Difficulty","Customized Dialog", JOptionPane.PLAIN_MESSAGE, null, difficulty, "Free");
-			
-			theBoard = new Board(row, column);
-			if (gamePlay==null) {
+			if (gamePlay==null && !gameInProgress) {
 				gamePlay = "Free";
 				isFree = true;
-			}
-			if (gamePlay.equals("Easy")){
-				easyBoard();
-			} else if (gamePlay.equals("Hard")) {
-				hardBoard();
-			} else if (!gamePlay.equals("Free")){
-				exitGame();
-			} else {
+			}else if (!gamePlaying) {
 				isFree = true;
-			}
-			rowLength = theBoard.getRowLength();
-			colLength = theBoard.getColLength();
-			emptySpinStack();
-			numberSelected = 0;
-			selectedArray = new int[2][2];
-			numberOfSpins = 0;
-			holderBoard = new int[row][column];
-			for(int i = 0; i < row; i++) {
-				for(int j = 0; j < column; j++) {
-					holderBoard[i][j] = theBoard.getBoard()[i][j].getValue();
-				}
-			}
-			holderBoard = convertBack(convert(holderBoard,row,column),row,column);
-			
-			gameJFrame.remove(textSpins);
-			textSpins = new JLabel("Spins: " + numberOfSpins);
-			textSpins.setBounds(gameWidth-150, 20,buttonSizeX, buttonSizeY);
-			textSpins.setFont(new Font("Monotype Corsiva",1,24));
-			gameJFrame.add(textSpins);
-			
-			gameIsReady = true;
-			selectedArray = new int[2][2];
-			gameIsReady = true;
-			if (row != 1 && column != 1) {
+				theBoard = new Board(row, column);
+				gamePlaying = true;
 				gameInProgress = true;
+
+			}else if (gamePlay == null) {
+				
 			}
+			else if (gamePlay.equals("Easy") || gamePlay.equals("Hard") || gamePlay.equals("Free")) {
+				theBoard = new Board(row, column);
+				if (gamePlay.equals("Easy")){
+					easyBoard();
+				} else if (gamePlay.equals("Hard")) {
+					hardBoard();
+				} else {
+					isFree = true;
+				}
+				rowLength = theBoard.getRowLength();
+				colLength = theBoard.getColLength();
+				emptySpinStack();
+				numberSelected = 0;
+				selectedArray = new int[2][2];
+				numberOfSpins = 0;
+				holderBoard = new int[row][column];
+				for(int i = 0; i < row; i++) {
+					for(int j = 0; j < column; j++) {
+						holderBoard[i][j] = theBoard.getBoard()[i][j].getValue();
+					}
+				}
+				holderBoard = convertBack(convert(holderBoard,row,column),row,column);
+				
+				gameJFrame.remove(textSpins);
+				textSpins = new JLabel("Spins: " + numberOfSpins);
+				textSpins.setBounds(gameWidth-150, 20,buttonSizeX, buttonSizeY);
+				textSpins.setFont(new Font("Monotype Corsiva",1,24));
+				gameJFrame.add(textSpins);
+				
+				gamePlaying = true;
+				gameInProgress = true;
+				selectedArray = new int[2][2];
+				
+				loadNames();
+			} 
 			
-			loadNames();
-		}
+		} 
 	
 		}
 
@@ -844,5 +818,51 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 			} else {
 				return false;
 			}
+	}
+	public boolean getRowsAndColumns() {
+		JTextField rows = new JTextField();
+		JTextField columns = new JTextField();
+		Object[] options = {"Rows:", rows, "Columns: ", columns};
+		boolean gameSetUpDone = false;
+		while(!gameSetUpDone) {
+			int option = JOptionPane.showConfirmDialog(gameJFrame, options, "New Game", JOptionPane.OK_CANCEL_OPTION);
+			if (option != JOptionPane.CANCEL_OPTION){
+
+				if (option == -1) {
+					if (!gameInProgress) {
+						nullInputInstantiateGame();
+						
+					} 
+					return true;
+				}
+				else if(rows.getText().isEmpty() ||columns.getText().isEmpty() ){
+
+					JOptionPane.showMessageDialog(gameJFrame, "You did not enter valid rows or columns. Please enter an integer less than or equal to 3");
+
+				}else if (Integer.parseInt(rows.getText()) > 3 || Integer.parseInt(columns.getText()) >3 || Integer.parseInt(rows.getText()) <1 ||  Integer.parseInt(columns.getText()) <1){
+					JOptionPane.showMessageDialog(gameJFrame, "You did not enter valid rows or columns. Please enter an integer less than or equal to 3");
+				} else {
+					row = Integer.parseInt(rows.getText());
+					column = Integer.parseInt(columns.getText());
+					gameSetUpDone = true;
+					
+				}
+				
+			} else if (!gamePlaying){
+				nullInputInstantiateGame();
+				return true;
+
+			} else {
+				return true;
+			}
+		}
+		return false;
+	}
+	public void nullInputInstantiateGame() {
+		row = 3;
+		column = 3;
+		theBoard = new Board(row, column);
+		gamePlaying = true;
+		isFree = true;
 	}
 }
