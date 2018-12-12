@@ -263,7 +263,7 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 				
 			}
 			else {
-				gameIsReady = false;
+				gamePlaying = false;
 				//gameInProgress = false;
 			}
 			
@@ -590,8 +590,10 @@ class SpinController extends TimerTask implements MouseListener, SpinControllerI
 			else if (gamePlay.equals("Easy") || gamePlay.equals("Hard") || gamePlay.equals("Free")) {
 				theBoard = new Board(row, column);
 				if (gamePlay.equals("Easy")){
+					while(theBoard.isIdentity())
 					easyBoard();
 				} else if (gamePlay.equals("Hard")) {
+					while(theBoard.isIdentity())
 					hardBoard();
 				} else {
 					isFree = true;
